@@ -12,10 +12,12 @@ Aplicação web para apoiar a administração de um condomínio e a comunicaçã
 | --- | --- | --- |
 | **Autenticação** | Login por escolha de perfil e usuário (ou e-mail e senha), com controle de sessão por perfil. | Todos |
 | **Página inicial** | Saudação, atalhos, próximos eventos, reservas e permissões do perfil logado. | Todos |
-| **Dados para teste** | Tabelas com os dados mockados e botão para restaurar os dados de exemplo. | Todos |
+| **Dados mockados** | Menu lateral recolhido na direita (`‹ Dados mockados`) com os dados salvos e botão para restaurar os dados de exemplo. | Todos |
 | **Calendário condominial** | Navegação entre meses, destaque dos dias com eventos e listagem dos eventos do dia selecionado. | Todos |
 | **Registro de eventos** | Cadastro de eventos (título, data, horário e local) que passam a aparecer no calendário para todos os moradores. | Síndica (administrador) |
-| **Reserva de áreas comuns** | Consulta de horários disponíveis por área e data, confirmação de reserva e bloqueio de conflitos de horário. | Moradores |
+| **Reserva de áreas comuns** | Consulta de horários disponíveis por área e data, confirmação de reserva e bloqueio de conflitos de horário. | Moradores e síndica |
+| **Portaria: controle de pessoas** | O porteiro informa o CPF; se estiver cadastrado, aparece "Apto a entrar" com as informações da pessoa (morador, visitante ou funcionário). Permite adicionar nova pessoa permitida. | Porteiro |
+| **Portaria: garagem** | Mesma ideia, pela placa do veículo (padrão antigo ou Mercosul). Só entram veículos de moradores, visitantes e funcionários cadastrados. Permite adicionar novo veículo permitido. | Porteiro |
 
 ---
 
@@ -39,19 +41,21 @@ Trabalho-eng-software/
 │   ├── login.html                    # Tela de login com escolha de perfil e dados de teste
 │   ├── calendario.html               # Calendário (versão inicial do módulo)
 │   ├── calendario-condominial.html   # Calendário + registro de eventos pela síndica
-│   └── reservas.html                 # Reserva de áreas comuns
+│   ├── reservas.html                 # Reserva de áreas comuns
+│   └── portaria.html                 # Controle de pessoas (CPF) e garagem (placa) pelo porteiro
 │
 ├── css/                              # Folhas de estilo
 │   ├── Calendario.css                # Estilos do calendário
 │   └── Sistema.css                   # Estilos compartilhados (cabeçalho, formulários, mensagens)
 │
 └── js/                               # Scripts
-    ├── Calendario.js                 # Lógica do calendário e eventos de exemplo
-    ├── DadosMock.js                  # Perfis, usuários, áreas comuns e reservas de exemplo
+    ├── Calendario.js                 # Lógica do calendário
+    ├── DadosMock.js                  # Perfis, usuários (com CPF), pessoas e veículos permitidos, áreas, reservas e eventos de exemplo
     ├── Comum.js                      # Sessão, armazenamento, cabeçalho e utilitários
     ├── Login.js                      # Escolha de perfil/usuário e autenticação
     ├── Inicio.js                     # Página inicial: eventos, reservas e perfil
-    ├── DadosTeste.js                 # Tabelas com os dados mockados para a equipe testar
+    ├── DadosTeste.js                 # Menu lateral "Dados mockados" (presente em todas as telas)
+    ├── Portaria.js                   # Consulta por CPF/placa, cadastro de pessoas e veículos, registros
     ├── RegistroEvento.js             # Cadastro de eventos e controle de acesso
     └── Reservas.js                   # Horários disponíveis, reservas e conflitos
 ```
@@ -66,12 +70,24 @@ Trabalho-eng-software/
    ```
 2. Abra a pasta do projeto no VS Code.
 3. Abra o arquivo `index.html` com a extensão **Live Server** (botão direito no arquivo > *Open with Live Server*) ou diretamente no navegador. Se ninguém estiver logado, o sistema abre a tela de login.
-4. Escolha o perfil (**Síndica** ou **Morador**) e clique no usuário para entrar.
-5. Os dados mockados (usuários com e-mail e senha, áreas, reservas e eventos) e um roteiro de teste ficam na seção **Dados para teste**, na tela de login e no fim da página inicial.
+4. Escolha o perfil (**Síndica**, **Morador** ou **Porteiro**) e clique no usuário para entrar.
+5. Os dados mockados (usuários com CPF, e-mail e senha, pessoas e veículos permitidos, áreas, reservas e eventos) e um roteiro de teste ficam no menu **Dados mockados**, na borda direita de todas as telas. Clique em `‹ Dados mockados` para abrir e em `› Fechar` (ou `Esc`) para recolher.
 
 ### Restaurar os dados de exemplo
 
-Os eventos e as reservas criados durante o uso ficam no `localStorage` do navegador. Para voltar ao estado inicial, clique em **Restaurar dados de exemplo** na seção *Dados para teste*.
+Eventos, reservas, pessoas, veículos e registros da portaria criados durante o uso ficam no `localStorage` do navegador. Para voltar ao estado inicial, clique em **Restaurar dados de exemplo** no menu *Dados mockados*.
+
+---
+
+## Portaria (porteiro)
+
+Login de teste: `porteiro@condominio.com` / `123456`.
+
+- **Pessoas:** digite um CPF (ex.: `123.456.789-09`). Cadastrado: mostra *Apto a entrar* com nome, CPF, tipo e destino. Não cadastrado (ex.: `111.444.777-35`): *Acesso não permitido*. CPF inválido: aviso de erro.
+- **Garagem:** digite uma placa (ex.: `ABC1D23` ou `JKL-9876`). Não cadastrada (ex.: `XYZ9K87`): *Acesso não permitido*.
+- **Adicionar:** em cada aba há um bloco *Adicionar pessoa/veículo permitido*. O CPF e a placa são validados e não podem se repetir.
+- Cada consulta fica em **Últimos registros** (Liberado / Negado).
+- Apenas o perfil *Porteiro* acessa a portaria; os demais recebem "Acesso negado".
 
 ---
 

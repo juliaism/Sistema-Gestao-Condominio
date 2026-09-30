@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<!--
+    portaria.html
+    Tela do porteiro. Dois controles, em abas:
+      - Pessoas: verifica o CPF de quem entra no condomínio e mostra se está apta;
+      - Garagem: verifica a placa do veículo (só moradores, visitantes e funcionários).
+    Nos dois é possível cadastrar uma nova pessoa / um novo veículo permitido.
+    A lógica está em Portaria.js; o acesso é restrito ao perfil "porteiro".
+
+    data-raiz="../" no <body>: esta página está um nível abaixo da raiz
+    (usado por caminho() em Comum.js para montar os links).
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portaria | Gestão Condominial</title>
+    <link rel="stylesheet" href="../css/Sistema.css" />
+</head>
+<body data-raiz="../">
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="coluna">
+            <!-- Aparece no lugar do conteúdo quando o usuário não é porteiro -->
+            <div id="mensagem-acesso" class="mensagem hidden" role="alert"></div>
+
+            <div id="conteudo-portaria">
+                <h1 class="pagina-titulo">Portaria</h1>
+                <p class="pagina-subtitulo">Controle de entrada de pessoas e de acesso à garagem.</p>
+
+                <!-- Abas: Pessoas | Garagem -->
+                <div class="abas" role="tablist">
+                    <button type="button" class="aba" id="aba-pessoas" role="tab" aria-selected="true" aria-controls="painel-pessoas">👤 Pessoas</button>
+                    <button type="button" class="aba" id="aba-garagem" role="tab" aria-selected="false" aria-controls="painel-garagem">🚗 Garagem</button>
+                </div>
+
+                <!-- ===== Controle de pessoas (CPF) ===== -->
+                <section id="painel-pessoas" role="tabpanel" aria-labelledby="aba-pessoas">
+                    <div class="painel">
+                        <h2 class="painel-titulo">Verificar entrada</h2>
+                        <p class="painel-texto">Informe o CPF de quem está entrando no condomínio.</p>
+
+                        <form id="form-cpf" class="form-consulta" novalidate>
+                            <label class="campo">
+                                CPF
+                                <input type="text" id="cpf-consulta" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
+                            </label>
+                            <button type="submit" class="btn btn-primario">Verificar</button>
+                        </form>
+
+                        <!-- Resultado da consulta (apta / não permitida / CPF inválido) -->
+                        <div id="resultado-pessoa" class="resultado hidden" aria-live="polite"></div>
+                    </div>
+
+                    <details class="painel recolhivel">
+                        <summary>Adicionar pessoa permitida</summary>
+                        <div id="mensagem-nova-pessoa" class="mensagem hidden" role="alert"></div>
+                        <form id="form-nova-pessoa" class="formulario" novalidate>
+                            <label class="campo">
+                                Nome completo
+                                <input type="text" id="pessoa-nome" maxlength="80">
+                            </label>
+                            <div class="campo-linha">
+                                <label class="campo">
+                                    CPF
+                                    <input type="text" id="pessoa-cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
+                                </label>
+                                <label class="campo">
+                                    Tipo
+                                    <select id="pessoa-tipo">
+                                        <option value="morador">Morador</option>
+                                        <option value="visitante">Visitante</option>
+                                        <option value="funcionario">Funcionário</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <label class="campo">
+                                <span>Apartamento ou setor <span class="campo-ajuda">(opcional)</span></span>
+                                <input type="text" id="pessoa-detalhe" maxlength="60" placeholder="Ex.: Apto 302 ou Limpeza">
+                            </label>
+                            <button type="submit" class="btn btn-primario">Adicionar pessoa</button>
+                        </form>
+                    </details>
+
+                    <div class="painel">
+                        <h2 class="painel-titulo">Últimos registros</h2>
+                        <ul id="registros-pessoas" class="lista-registros"></ul>
+                    </div>
+                </section>
+
+                <!-- ===== Controle da garagem (placa) ===== -->
+                <section id="painel-garagem" role="tabpanel" aria-labelledby="aba-garagem" class="hidden">
+                    <div class="painel">
+                        <h2 class="painel-titulo">Verificar veículo</h2>
+                        <p class="painel-texto">A garagem é liberada apenas para veículos de moradores, visitantes e funcionários cadastrados.</p>
+
+                        <form id="form-placa" class="form-consulta" novalidate>
+                            <label class="campo">
+                                Placa
+                                <input type="text" id="placa-consulta" maxlength="8" placeholder="ABC1D23" autocomplete="off">
+                            </label>
+                            <button type="submit" class="btn btn-primario">Verificar</button>
+                        </form>
+
+                        <div id="resultado-veiculo" class="resultado hidden" aria-live="polite"></div>
+                    </div>
+
+                    <details class="painel recolhivel">
+                        <summary>Adicionar veículo permitido</summary>
+                        <div id="mensagem-novo-veiculo" class="mensagem hidden" role="alert"></div>
+                        <form id="form-novo-veiculo" class="formulario" novalidate>
+                            <div class="campo-linha">
+                                <label class="campo">
+                                    Placa
+                                    <input type="text" id="veiculo-placa" maxlength="8" placeholder="ABC1D23" autocomplete="off">
+                                </label>
+                                <label class="campo">
+                                    Tipo
+                                    <select id="veiculo-tipo">
+                                        <option value="morador">Morador</option>
+                                        <option value="visitante">Visitante</option>
+                                        <option value="funcionario">Funcionário</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="campo-linha">
+                                <label class="campo">
+                                    Modelo
+                                    <input type="text" id="veiculo-modelo" maxlength="40" placeholder="Ex.: Honda Civic">
+                                </label>
+                                <label class="campo">
+                                    <span>Cor <span class="campo-ajuda">(opcional)</span></span>
+                                    <input type="text" id="veiculo-cor" maxlength="20">
+                                </label>
+                            </div>
+                            <label class="campo">
+                                Proprietário
+                                <input type="text" id="veiculo-proprietario" maxlength="80">
+                            </label>
+                            <label class="campo">
+                                <span>Apartamento ou setor <span class="campo-ajuda">(opcional)</span></span>
+                                <input type="text" id="veiculo-detalhe" maxlength="60" placeholder="Ex.: Apto 302 ou Manutenção">
+                            </label>
+                            <button type="submit" class="btn btn-primario">Adicionar veículo</button>
+                        </form>
+                    </details>
+
+                    <div class="painel">
+                        <h2 class="painel-titulo">Últimos registros</h2>
+                        <ul id="registros-veiculos" class="lista-registros"></ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela -->
+    <script src="../js/DadosMock.js"></script>
+    <script src="../js/Comum.js"></script>
+    <script src="../js/Portaria.js"></script>
+    <script src="../js/DadosTeste.js"></script>
+</body>
+</html>

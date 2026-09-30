@@ -16,6 +16,11 @@
 // Garante que há alguém logado (senão redireciona para o login).
 const usuarioLogado = exigirLogin();
 
+// O porteiro não faz reservas: volta para a página inicial.
+if (ehPorteiro(usuarioLogado)) {
+    window.location.replace(caminho("index.html"));
+}
+
 // Referências aos elementos da tela.
 const formReserva = document.getElementById("form-reserva");
 const campoArea = document.getElementById("area-reserva");

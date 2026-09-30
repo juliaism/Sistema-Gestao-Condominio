@@ -3,8 +3,9 @@
  * ------------------------------------------------------------------
  * Dados "falsos" (mockados) usados pelo sistema, já que o projeto não
  * possui backend nem banco de dados. Estes valores são o estado inicial
- * da aplicação; o que o usuário cria durante o uso (novos eventos e
- * reservas) é salvo separadamente no localStorage (ver Comum.js).
+ * da aplicação; o que o usuário cria durante o uso (eventos, reservas,
+ * pessoas e veículos permitidos) é salvo separadamente no localStorage
+ * (ver Comum.js).
  *
  * Este arquivo deve ser carregado ANTES de Comum.js e das demais telas,
  * pois elas usam as constantes declaradas aqui.
@@ -21,7 +22,7 @@ const perfisMock = [
     {
         id: "admin",
         nome: "Síndica",
-        resumo: "Administração do condomínio",
+        resumo: "Administração",
         permissoes: [
             "Registrar eventos no calendário condominial",
             "Ver todas as reservas de áreas comuns",
@@ -31,29 +32,68 @@ const perfisMock = [
     {
         id: "morador",
         nome: "Morador",
-        resumo: "Residente do condomínio",
+        resumo: "Residente",
         permissoes: [
             "Ver os eventos do calendário condominial",
             "Reservar áreas comuns",
             "Acompanhar as próprias reservas"
         ]
+    },
+    {
+        id: "porteiro",
+        nome: "Porteiro",
+        resumo: "Portaria",
+        permissoes: [
+            "Controlar a entrada de pessoas pelo CPF",
+            "Controlar o acesso à garagem pela placa do veículo",
+            "Cadastrar novas pessoas e veículos permitidos",
+            "Consultar o calendário e as reservas do condomínio"
+        ]
     }
 ];
 
 /*
- * Usuários cadastrados no condomínio.
+ * Usuários do sistema (quem faz login).
  * - id:          identificador único do usuário (usado na sessão e nas reservas)
  * - nome:        nome exibido no cabeçalho
+ * - cpf:         CPF (somente números), usado no controle de entrada
  * - email/senha: credenciais usadas no login (texto puro, só para demonstração)
- * - perfil:      "admin" = administrador (pode registrar eventos)
- *                "morador" = usuário comum
- * - cargo:       rótulo exibido ao lado do nome (ex.: "Síndica")
- * - apartamento: número do apartamento (null para a administração)
+ * - perfil:      "admin" | "morador" | "porteiro"
+ * - cargo:       rótulo exibido ao lado do nome
+ * - apartamento: número do apartamento (null para quem não mora no condomínio)
  */
 const usuariosMock = [
-    { id: "u1", nome: "Fernanda Lima", email: "sindica@condominio.com", senha: "123456", perfil: "admin", cargo: "Síndica", apartamento: null },
-    { id: "u2", nome: "Carlos Mendes", email: "carlos@condominio.com", senha: "123456", perfil: "morador", cargo: "Morador", apartamento: "302" },
-    { id: "u3", nome: "João Pereira", email: "joao@condominio.com", senha: "123456", perfil: "morador", cargo: "Morador", apartamento: "1401" }
+    { id: "u1", nome: "Fernanda Lima", cpf: "52998224725", email: "sindica@condominio.com", senha: "123456", perfil: "admin", cargo: "Síndica", apartamento: null },
+    { id: "u2", nome: "Carlos Mendes", cpf: "12345678909", email: "carlos@condominio.com", senha: "123456", perfil: "morador", cargo: "Morador", apartamento: "302" },
+    { id: "u3", nome: "João Pereira", cpf: "98765432100", email: "joao@condominio.com", senha: "123456", perfil: "morador", cargo: "Morador", apartamento: "1401" },
+    { id: "u4", nome: "Roberto Alves", cpf: "24681357928", email: "porteiro@condominio.com", senha: "123456", perfil: "porteiro", cargo: "Porteiro", apartamento: null }
+];
+
+/*
+ * Outras pessoas permitidas no condomínio (além dos usuários acima, que
+ * também são considerados pessoas permitidas).
+ * - tipo:    "morador" | "visitante" | "funcionario"
+ * - detalhe: apartamento visitado / apartamento de residência / setor
+ */
+const pessoasMock = [
+    { id: "p1", nome: "Helena Mendes", cpf: "13579246828", tipo: "morador", detalhe: "Apto 302" },
+    { id: "p2", nome: "Mariana Costa", cpf: "11122233396", tipo: "visitante", detalhe: "Visita ao Apto 302" },
+    { id: "p3", nome: "Paulo Souza", cpf: "22233344405", tipo: "visitante", detalhe: "Visita ao Apto 1401" },
+    { id: "p4", nome: "Ana Ribeiro", cpf: "33344455508", tipo: "funcionario", detalhe: "Limpeza" },
+    { id: "p5", nome: "Marcos Teixeira", cpf: "44455566619", tipo: "funcionario", detalhe: "Manutenção" }
+];
+
+/*
+ * Veículos com acesso liberado à garagem (somente moradores, visitantes
+ * e funcionários). A placa é guardada sem hífen e em maiúsculas; aceita
+ * o padrão antigo (ABC1234) e o Mercosul (ABC1D23).
+ */
+const veiculosMock = [
+    { id: "v1", placa: "ABC1D23", modelo: "Honda Civic", cor: "Preto", tipo: "morador", proprietario: "Carlos Mendes", detalhe: "Apto 302" },
+    { id: "v2", placa: "RST4E56", modelo: "Toyota Corolla", cor: "Prata", tipo: "morador", proprietario: "João Pereira", detalhe: "Apto 1401" },
+    { id: "v3", placa: "JKL9876", modelo: "Fiat Uno", cor: "Branco", tipo: "visitante", proprietario: "Mariana Costa", detalhe: "Visita ao Apto 302" },
+    { id: "v4", placa: "QWE2R34", modelo: "Chevrolet Onix", cor: "Vermelho", tipo: "funcionario", proprietario: "Marcos Teixeira", detalhe: "Manutenção" },
+    { id: "v5", placa: "MNO5P67", modelo: "Hyundai HB20", cor: "Azul", tipo: "funcionario", proprietario: "Fernanda Lima", detalhe: "Administração" }
 ];
 
 /*
@@ -104,3 +144,17 @@ const reservasMock = [
     { id: "r3", areaId: "piscina", data: "2026-10-03", horario: "10:00 - 12:00", moradorId: "u2" },
     { id: "r4", areaId: "quadra", data: "2026-10-03", horario: "18:00 - 20:00", moradorId: "u3" }
 ];
+
+/*
+ * Eventos de exemplo do calendário condominial, agrupados por data
+ * (AAAA-MM-DD). Os eventos registrados pela síndica são salvos à parte.
+ */
+const mockEventos = {
+    "2026-10-14": [
+        { id: "1", titulo: "Aula de natação particular", horario: "08:00 - 10:00", local: "Piscina" },
+        { id: "2", titulo: "Reparo Ar-Condicionado", horario: "10:15 - 12:15", local: "Academia" }
+    ],
+    "2026-10-15": [
+        { id: "3", titulo: "Festa Joao (apt 1401)", horario: "14:00 - 18:00", local: "Salão de Festas" }
+    ]
+};

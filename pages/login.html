@@ -2,10 +2,10 @@
 <!--
     login.html
     Tela de entrada do sistema (ponto de entrada).
-    O usuário escolhe o perfil (Síndica ou Morador) e clica no usuário
-    para entrar. Também é possível entrar digitando e-mail e senha.
-    Perfis e usuários vêm dos dados mockados em DadosMock.js.
-    Abaixo do login ficam as tabelas com os dados de teste.
+    O usuário escolhe o perfil (Síndica, Morador ou Porteiro) e clica no
+    usuário para entrar. Também é possível entrar digitando e-mail e senha.
+    Perfis e usuários vêm dos dados mockados em DadosMock.js, que também
+    aparecem no menu lateral "Dados mockados" (DadosTeste.js).
 
     data-raiz="../" no <body>: esta página está um nível abaixo da raiz
     (usado por caminho() em Comum.js para montar os links).
@@ -15,23 +15,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Gestão Condominial</title>
-    <!-- Estilos compartilhados das telas do sistema -->
     <link rel="stylesheet" href="../css/Sistema.css" />
 </head>
 <body data-raiz="../">
-    <!-- "login" divide a tela em apresentação (esquerda) e acesso (direita) -->
     <main class="login">
-
         <!-- Apresentação do sistema -->
         <section class="login-apresentacao">
             <h1 class="login-marca">Gestão Condominial</h1>
             <p class="login-texto">
-                Eventos, reservas de áreas comuns e informações do condomínio em um só lugar.
+                Eventos, reservas, portaria e informações do condomínio em um só lugar.
             </p>
             <ul class="login-recursos">
-                <li><strong>Calendário condominial:</strong> acompanhe os eventos do condomínio.</li>
-                <li><strong>Reservas:</strong> reserve salão, churrasqueira, piscina e quadra.</li>
-                <li><strong>Administração:</strong> a síndica registra eventos para todos os moradores.</li>
+                <li><strong>Calendário:</strong> acompanhe os eventos do condomínio.</li>
+                <li><strong>Reservas:</strong> salão, churrasqueira, piscina e quadra.</li>
+                <li><strong>Portaria:</strong> controle de pessoas por CPF e da garagem por placa.</li>
+                <li><strong>Administração:</strong> a síndica registra eventos para todos.</li>
             </ul>
         </section>
 
@@ -55,8 +53,6 @@
             <!-- Alternativa: login digitando e-mail e senha (fica recolhido) -->
             <details class="login-manual">
                 <summary>Entrar com e-mail e senha</summary>
-                <!-- "novalidate" desativa os balões padrão do navegador;
-                     a validação é feita em Login.js. -->
                 <form id="form-login" class="formulario" novalidate>
                     <label class="campo">
                         E-mail
@@ -70,27 +66,11 @@
                 </form>
             </details>
         </section>
-
-        <!-- Dados mockados exibidos para a equipe testar o sistema
-             (tabelas montadas por DadosTeste.js) -->
-        <section class="painel dados-teste">
-            <details open>
-                <summary class="dados-teste-titulo">Dados para teste (mockados)</summary>
-                <p class="painel-texto">
-                    Usuários, áreas, reservas e eventos disponíveis para testar o sistema.
-                    O que for criado durante os testes fica salvo apenas neste navegador.
-                </p>
-                <div id="dados-teste"></div>
-            </details>
-        </section>
     </main>
 
-    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela.
-         Calendario.js é carregado apenas para que os dados de teste listem os
-         eventos de exemplo (mockEventos); aqui ele não desenha o calendário. -->
+    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela -->
     <script src="../js/DadosMock.js"></script>
     <script src="../js/Comum.js"></script>
-    <script src="../js/Calendario.js"></script>
     <script src="../js/Login.js"></script>
     <script src="../js/DadosTeste.js"></script>
 </body>

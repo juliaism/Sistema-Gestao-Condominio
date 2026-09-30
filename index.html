@@ -6,7 +6,7 @@
     Reúne as informações principais do usuário: saudação, atalhos, próximos
     eventos do condomínio, reservas e dados/permissões do perfil. O conteúdo
     muda conforme o perfil (Síndica ou Morador) e é montado por Inicio.js.
-    No final da página ficam os dados mockados, para facilitar os testes.
+    Os dados mockados ficam no menu lateral da direita (DadosTeste.js).
 
     data-raiz="" no <body>: esta página está na raiz do projeto
     (usado por caminho() em Comum.js para montar os links).
@@ -51,7 +51,7 @@
                 <section class="painel">
                     <div class="painel-cabecalho">
                         <h2 id="titulo-reservas" class="painel-titulo">Minhas reservas</h2>
-                        <a class="painel-link" href="pages/reservas.html">Nova reserva</a>
+                        <a id="link-nova-reserva" class="painel-link" href="pages/reservas.html">Nova reserva</a>
                     </div>
                     <ul id="lista-reservas-inicio" class="lista-eventos"></ul>
                 </section>
@@ -64,28 +64,12 @@
                     <ul id="permissoes" class="lista-permissoes"></ul>
                 </section>
             </div>
-
-            <!-- Dados mockados exibidos para a equipe testar o sistema
-                 (tabelas montadas por DadosTeste.js) -->
-            <section class="painel dados-teste">
-                <details>
-                    <summary class="dados-teste-titulo">Dados para teste (mockados)</summary>
-                    <p class="painel-texto">
-                        Usuários, áreas, reservas e eventos disponíveis para testar o sistema.
-                        O que for criado durante os testes fica salvo apenas neste navegador.
-                    </p>
-                    <div id="dados-teste"></div>
-                </details>
-            </section>
         </div>
     </main>
 
-    <!-- Ordem importa. Calendario.js é carregado apenas para ler os eventos
-         de exemplo (mockEventos); nesta página ele não desenha o calendário,
-         pois os elementos do calendário não existem aqui. -->
+    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela -->
     <script src="js/DadosMock.js"></script>
     <script src="js/Comum.js"></script>
-    <script src="js/Calendario.js"></script>
     <script src="js/Inicio.js"></script>
     <script src="js/DadosTeste.js"></script>
 </body>

@@ -1,9 +1,10 @@
 /*
  * Sistema.css
  * ------------------------------------------------------------------
- * Estilos compartilhados das telas do sistema: login, página inicial,
- * registro de eventos e reservas. Usa o mesmo azul de Calendario.css
- * como cor principal, para manter a identidade visual do projeto.
+ * Estilos compartilhados das telas do sistema. Visual limpo e organizado,
+ * com o azul do calendário como cor principal: cabeçalho com selo, faixa de
+ * boas-vindas em degradê, cartões com sombra suave e títulos com destaque,
+ * resultados da portaria bem visíveis e menu lateral de dados em azul.
  *
  * Organização:
  *   1. Fonte e variáveis
@@ -16,8 +17,9 @@
  *   8. Reservas
  *   9. Login
  *  10. Página inicial
- *  11. Dados para teste
- *  12. Telas pequenas
+ *  11. Portaria
+ *  12. Menu lateral "Dados mockados"
+ *  13. Telas pequenas
  */
 
 /* ---------- 1. Fonte e variáveis ---------- */
@@ -27,20 +29,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-    /* Cores principais */
     --primary-color: #277aae;       /* azul principal (mesmo do calendário) */
-    --primary-hover: #1f6390;       /* azul mais escuro ao passar o mouse */
+    --primary-hover: #1f6390;
     --primary-dark: #17496b;        /* azul escuro (degradês) */
-    --primary-soft: #e8f1f8;        /* azul bem claro (fundos de destaque) */
+    --primary-soft: #e6f1f9;        /* fundo de destaque claro */
 
-    /* Fundos e textos */
-    --background-color: #f3f6fa;    /* fundo da página */
-    --card-background: #ffffff;     /* fundo dos painéis */
-    --text-color: #1f2a37;          /* texto principal */
-    --muted-color: #5f6b7a;         /* texto secundário */
-    --border-color: #e2e8f0;        /* bordas de painéis e campos */
+    --background-color: #f1f5f9;
+    --card-background: #ffffff;
+    --text-color: #1f2a37;
+    --muted-color: #667085;
+    --border-color: #e4e7ec;
 
-    /* Mensagens */
     --success-bg: #ecf8f0;
     --success-text: #1e6b34;
     --success-border: #3aa561;
@@ -48,23 +47,21 @@
     --error-text: #a12622;
     --error-border: #d9534f;
 
-    /* Medidas reutilizadas */
     --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-    --shadow-md: 0 4px 16px rgba(16, 24, 40, 0.06);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.07);
+    --shadow-lg: 0 14px 34px rgba(16, 24, 40, 0.12);
     --transicao: 0.15s ease;
 }
 
 /* ---------- 2. Base ---------- */
 
-/* Sobrescreve o body do Calendario.css (que centraliza tudo em linha)
-   para permitir cabeçalho em cima e conteúdo embaixo. */
+/* Sobrescreve o body do Calendario.css (que centraliza tudo em linha). */
 body {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(180deg, #e9f0f7 0, var(--background-color) 320px);
+    background: linear-gradient(180deg, #dfeaf4 0, var(--background-color) 340px);
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
@@ -76,12 +73,12 @@ body {
 }
 
 /* Esconde elementos. O !important garante que funcione mesmo em
-   elementos que definem "display" em outra classe (ex.: .formulario). */
+   elementos que definem "display" em outra classe. */
 .hidden {
     display: none !important;
 }
 
-/* Contorno visível ao navegar pelo teclado (Tab), em qualquer elemento clicável */
+/* Contorno visível ao navegar pelo teclado (Tab) */
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible {
@@ -91,23 +88,23 @@ summary:focus-visible {
 
 /* ---------- 3. Cabeçalho ---------- */
 
-/* Barra do topo, fixa ao rolar a página */
 .topo {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 24px;
+    box-shadow: var(--shadow-sm);
+    padding: 10px 28px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 12px 20px;
+    gap: 10px 24px;
 }
 
-/* Nome do sistema, com um selo "GC" (Gestão Condominial) feito em CSS */
+/* Nome do sistema com o selo "GC" (Gestão Condominial) */
 .topo-marca {
     display: flex;
     align-items: center;
@@ -120,8 +117,8 @@ summary:focus-visible {
 
 .topo-marca::before {
     content: "GC";
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: #ffffff;
@@ -130,9 +127,10 @@ summary:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(23, 73, 107, 0.3);
 }
 
-/* Menu de navegação em formato de "pílulas" */
+/* Menu em pílulas; a página atual fica azul e preenchida */
 .topo-nav {
     display: flex;
     gap: 4px;
@@ -145,8 +143,8 @@ summary:focus-visible {
     color: var(--muted-color);
     text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-    padding: 6px 16px;
+    font-weight: 600;
+    padding: 7px 18px;
     border-radius: 999px;
     transition: background var(--transicao), color var(--transicao);
 }
@@ -156,15 +154,12 @@ summary:focus-visible {
     background: #ffffff;
 }
 
-/* Link da página atual */
 .topo-link.ativo {
-    background: #ffffff;
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
+    background: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(39, 122, 174, 0.35);
 }
 
-/* Nome, cargo e botão "Sair" */
 .topo-usuario {
     display: flex;
     align-items: center;
@@ -173,7 +168,6 @@ summary:focus-visible {
     font-weight: 500;
 }
 
-/* Etiqueta com o cargo (ex.: "Síndica", "Morador") */
 .perfil-badge {
     font-size: 12px;
     font-weight: 600;
@@ -185,35 +179,51 @@ summary:focus-visible {
 
 /* ---------- 4. Layout e painéis ---------- */
 
-/* Espaçamento da área de conteúdo */
 .pagina {
-    padding: 28px 16px 40px;
+    padding: 28px 16px 64px;
 }
 
-/* Coloca os painéis lado a lado; em telas estreitas, um embaixo do outro */
+/* Coluna central (portaria) */
+.coluna {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.pagina-titulo {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px 0;
+}
+
+.pagina-subtitulo {
+    font-size: 14px;
+    color: var(--muted-color);
+    margin: 0 0 20px 0;
+}
+
+/* Painéis lado a lado; em telas estreitas, um embaixo do outro */
 .layout {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: flex-start;
-    gap: 24px;
+    gap: 20px;
 }
 
-/* Largura dos painéis dentro do layout (inclui o .container do calendário) */
 .layout > .container,
 .layout > .painel {
     flex: 1 1 340px;
     max-width: 420px;
 }
 
-/* Deixa o cartão do calendário com a mesma borda e sombra dos painéis */
+/* Cartão do calendário com a mesma aparência dos painéis */
 .layout > .container {
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
     border-radius: var(--radius-lg);
 }
 
-/* Cartão branco que envolve cada bloco de conteúdo */
 .painel {
     background: var(--card-background);
     border: 1px solid var(--border-color);
@@ -222,31 +232,44 @@ summary:focus-visible {
     box-shadow: var(--shadow-md);
 }
 
+.coluna .painel,
+.coluna .recolhivel {
+    margin-bottom: 16px;
+}
+
+/* Título com uma barrinha azul à esquerda, para separar bem as seções */
 .painel-titulo {
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
     font-weight: 700;
     letter-spacing: -0.01em;
     margin: 0 0 6px 0;
 }
 
-/* Texto explicativo abaixo do título */
+.painel-titulo::before {
+    content: "";
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--primary-color);
+}
+
 .painel-texto {
     font-size: 14px;
     color: var(--muted-color);
-    margin: 0 0 18px 0;
+    margin: 0 0 16px 0;
 }
 
 /* ---------- 5. Formulários ---------- */
 
-/* Campos empilhados com espaço entre eles */
 .formulario {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
-/* Um campo: rótulo em cima, entrada embaixo.
-   Também usado no <fieldset> de horários (por isso zera borda/padding). */
 .campo {
     display: flex;
     flex-direction: column;
@@ -265,7 +288,6 @@ summary:focus-visible {
     margin-bottom: 8px;
 }
 
-/* Caixas de texto, data, hora e seleção */
 .campo input,
 .campo select {
     font: inherit;
@@ -273,33 +295,25 @@ summary:focus-visible {
     font-weight: 400;
     color: inherit;
     background: #ffffff;
-    padding: 10px 12px;
+    padding: 11px 14px;
     border: 1px solid #cfd8e3;
     border-radius: var(--radius-sm);
     transition: border-color var(--transicao), box-shadow var(--transicao);
 }
 
-.campo input:hover,
-.campo select:hover {
-    border-color: #aebccb;
-}
-
-/* Campo em foco: borda azul com um halo suave */
 .campo input:focus,
 .campo select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(39, 122, 174, 0.18);
+    box-shadow: 0 0 0 3px rgba(39, 122, 174, 0.2);
 }
 
-/* Dois campos na mesma linha (ex.: início e término) */
 .campo-linha {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-/* Texto de ajuda pequeno e cinza */
 .campo-ajuda {
     font-size: 12px;
     font-weight: 400;
@@ -307,7 +321,6 @@ summary:focus-visible {
     margin: 0;
 }
 
-/* Botões do rodapé do formulário, alinhados à direita */
 .form-acoes {
     display: flex;
     justify-content: flex-end;
@@ -317,12 +330,11 @@ summary:focus-visible {
 
 /* ---------- 6. Botões ---------- */
 
-/* Base comum a todos os botões */
 .btn {
     font: inherit;
     font-size: 14px;
     font-weight: 600;
-    padding: 10px 18px;
+    padding: 11px 20px;
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     cursor: pointer;
@@ -330,24 +342,21 @@ summary:focus-visible {
                 box-shadow var(--transicao), transform var(--transicao);
 }
 
-/* Leve "afundar" ao clicar */
 .btn:active {
     transform: translateY(1px);
 }
 
-/* Ação principal (azul) */
 .btn-primario {
     background: var(--primary-color);
     color: #ffffff;
-    box-shadow: 0 1px 2px rgba(23, 73, 107, 0.25);
+    box-shadow: 0 2px 6px rgba(39, 122, 174, 0.3);
 }
 
 .btn-primario:hover {
     background: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(23, 73, 107, 0.25);
+    box-shadow: 0 4px 12px rgba(39, 122, 174, 0.35);
 }
 
-/* Ação secundária (branco com borda) */
 .btn-secundario {
     background: #ffffff;
     color: var(--text-color);
@@ -359,18 +368,15 @@ summary:focus-visible {
     border-color: #aebccb;
 }
 
-/* Botão ocupando toda a largura */
 .btn-bloco {
     width: 100%;
 }
 
-/* Botão menor (ex.: "Sair") */
 .btn-pequeno {
-    padding: 6px 12px;
+    padding: 5px 12px;
     font-size: 13px;
 }
 
-/* Links com aparência de botão */
 a.btn {
     display: inline-block;
     text-decoration: none;
@@ -378,12 +384,10 @@ a.btn {
 
 /* ---------- 7. Mensagens ---------- */
 
-/* Caixa de mensagem com uma faixa colorida à esquerda;
-   a cor vem de .mensagem-sucesso ou .mensagem-erro */
 .mensagem {
     font-size: 14px;
     font-weight: 500;
-    padding: 12px 14px;
+    padding: 10px 14px;
     border-radius: var(--radius-sm);
     border-left: 4px solid transparent;
     margin-bottom: 16px;
@@ -401,64 +405,55 @@ a.btn {
     border-left-color: var(--error-border);
 }
 
-/* Texto exibido quando uma lista está vazia */
 .lista-vazia {
     font-size: 14px;
     font-weight: 400;
-    font-style: italic;
-    color: #8a94a3;
+    color: #98a2b3;
     margin: 0;
 }
 
 /* ---------- 8. Reservas ---------- */
 
-/* Grade de horários: quantas colunas couberem, com no mínimo 130px cada */
 .lista-horarios {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
+    gap: 8px;
 }
 
-/* Aviso "Selecione uma área..." ocupa a linha inteira da grade */
 .lista-horarios .lista-vazia {
     grid-column: 1 / -1;
 }
 
-/* Botão de um horário (faixa de horas + situação) */
 .horario {
     font: inherit;
     color: inherit;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 12px;
+    gap: 2px;
+    padding: 10px 12px;
     background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: border-color var(--transicao), box-shadow var(--transicao), background var(--transicao);
+    transition: border-color var(--transicao), background var(--transicao);
 }
 
 .horario:hover {
     border-color: var(--primary-color);
-    box-shadow: var(--shadow-sm);
 }
 
-/* Faixa de horário (ex.: "14:00 - 18:00") */
 .horario-hora {
     font-size: 14px;
     font-weight: 600;
 }
 
-/* Situação com um pontinho colorido antes do texto:
-   verde para "Disponível"... */
+/* Pontinho colorido: verde "Disponível", vermelho "Ocupado" */
 .horario-status {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    font-weight: 500;
     color: var(--success-text);
 }
 
@@ -470,33 +465,28 @@ a.btn {
     background: currentColor;
 }
 
-/* ...e vermelho para "Ocupado", com fundo acinzentado */
 .horario.ocupado {
-    background: #f7f8fa;
+    background: var(--background-color);
 }
 
 .horario.ocupado .horario-status {
     color: var(--error-text);
 }
 
-/* Horário escolhido pelo morador */
 .horario.selecionado {
     background: var(--primary-soft);
     border-color: var(--primary-color);
-    box-shadow: inset 0 0 0 1px var(--primary-color);
 }
 
-/* Lista "Minhas reservas" sem marcadores */
 .lista-reservas {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
-/* Cada reserva, com a faixa azul à esquerda como os cards do calendário */
 .reserva-item {
     background: #f8fafc;
     border: 1px solid var(--border-color);
@@ -507,7 +497,7 @@ a.btn {
 
 .reserva-area {
     font-weight: 600;
-    margin: 0 0 4px 0;
+    margin: 0 0 2px 0;
 }
 
 .reserva-detalhe {
@@ -518,7 +508,7 @@ a.btn {
 
 /* ---------- 9. Login ---------- */
 
-/* Tela dividida: apresentação à esquerda e acesso à direita.
+/* Tela dividida: apresentação em azul à esquerda e acesso à direita.
    Em telas estreitas, as partes ficam uma embaixo da outra. */
 .login {
     min-height: 100vh;
@@ -532,12 +522,11 @@ a.btn {
     padding: 40px 16px;
 }
 
-/* Bloco de apresentação: cartão azul em degradê com texto branco */
 .login-apresentacao {
     flex: 1 1 300px;
     max-width: 380px;
     box-sizing: border-box;
-    padding: 36px 32px;
+    padding: 40px 34px;
     border-radius: var(--radius-lg);
     background: linear-gradient(150deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: #ffffff;
@@ -547,7 +536,6 @@ a.btn {
     justify-content: center;
 }
 
-/* Nome do sistema, com o mesmo selo "GC" do cabeçalho (em versão clara) */
 .login-marca {
     display: flex;
     align-items: center;
@@ -558,11 +546,10 @@ a.btn {
     margin: 0 0 14px 0;
 }
 
-.login-marca::before {
+.login-apresentacao .login-marca::before {
     content: "GC";
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -574,93 +561,88 @@ a.btn {
 
 .login-texto {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0 0 24px 0;
+    line-height: 1.55;
+    margin: 0 0 22px 0;
+    color: rgba(255, 255, 255, 0.88);
 }
 
-/* Lista dos recursos do sistema, com marcadores circulares próprios */
 .login-recursos {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.92);
 }
 
 .login-recursos li {
+    padding-left: 26px;
     position: relative;
-    padding-left: 22px;
 }
 
 .login-recursos li::before {
-    content: "";
+    content: "✓";
     position: absolute;
     left: 0;
-    top: 6px;
-    width: 8px;
-    height: 8px;
+    top: 0;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.login-recursos strong {
-    color: #ffffff;
-}
-
-/* Painel de acesso (perfis, usuários e formulário) */
 .login-acesso {
-    flex: 1 1 340px;
-    max-width: 420px;
+    flex: 1 1 400px;
+    max-width: 460px;
     box-sizing: border-box;
-    box-shadow: var(--shadow-lg);
 }
 
-/* Botões de perfil lado a lado */
+.login-acesso h2.painel-titulo {
+    font-size: 20px;
+}
+
 .perfis {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
-/* Um botão de perfil (nome + resumo) */
 .perfil-opcao {
     font: inherit;
-    color: inherit;
     text-align: left;
+    color: var(--text-color);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 14px;
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: border-color var(--transicao), background var(--transicao), box-shadow var(--transicao);
+    transition: border-color var(--transicao), background var(--transicao);
 }
 
 .perfil-opcao:hover {
-    border-color: var(--primary-color);
+    border-color: #b8c2cf;
 }
 
-/* Perfil escolhido */
 .perfil-opcao[aria-pressed="true"] {
-    background: var(--primary-soft);
     border-color: var(--primary-color);
+    background: var(--primary-soft);
     box-shadow: inset 0 0 0 1px var(--primary-color);
 }
 
 .perfil-nome {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-}
-
-.perfil-opcao[aria-pressed="true"] .perfil-nome {
-    color: var(--primary-color);
 }
 
 .perfil-resumo {
@@ -668,71 +650,58 @@ a.btn {
     color: var(--muted-color);
 }
 
-/* O que o perfil escolhido pode fazer, em uma caixa cinza clara */
 .perfil-permissoes {
-    margin: 0 0 16px 0;
-    padding: 12px 14px 12px 30px;
-    background: var(--background-color);
-    border-radius: var(--radius-sm);
+    margin: 0 0 14px 0;
+    padding-left: 18px;
     font-size: 13px;
     color: var(--muted-color);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
 }
 
-/* Cartões dos usuários */
 .usuarios-lista {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-/* Um cartão de usuário: avatar, nome/detalhe e "Entrar" */
 .usuario-card {
     font: inherit;
-    color: inherit;
     text-align: left;
-    width: 100%;
+    color: inherit;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
+    padding: 10px 12px;
     background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: border-color var(--transicao), box-shadow var(--transicao), transform var(--transicao);
+    transition: border-color var(--transicao);
 }
 
 .usuario-card:hover {
     border-color: var(--primary-color);
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
 }
 
-/* Círculo com as iniciais do nome */
 .avatar {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Nome e detalhe ocupam o espaço do meio */
 .usuario-info {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .usuario-nome {
@@ -740,7 +709,6 @@ a.btn {
     font-weight: 600;
 }
 
-/* E-mail longo é cortado com "..." em vez de quebrar o cartão */
 .usuario-detalhe {
     font-size: 12px;
     color: var(--muted-color);
@@ -749,30 +717,21 @@ a.btn {
     white-space: nowrap;
 }
 
-/* Texto "Entrar" em formato de pequeno botão */
 .usuario-entrar {
     font-size: 13px;
     font-weight: 600;
     color: var(--primary-color);
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--primary-soft);
-    transition: background var(--transicao), color var(--transicao);
 }
 
-.usuario-card:hover .usuario-entrar {
-    background: var(--primary-color);
-    color: #ffffff;
-}
-
-/* Login com e-mail e senha, recolhido por padrão */
 .login-manual {
-    margin-top: 20px;
-    padding-top: 16px;
+    margin-top: 16px;
     border-top: 1px solid var(--border-color);
+    padding-top: 12px;
 }
 
-.login-manual summary {
+.login-manual summary,
+.recolhivel summary,
+.dados-secao summary {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -780,30 +739,29 @@ a.btn {
 }
 
 .login-manual .formulario {
-    margin-top: 16px;
+    margin-top: 14px;
 }
 
 /* ---------- 10. Página inicial ---------- */
 
-/* Coluna central da página inicial */
 .inicio {
-    max-width: 1080px;
+    max-width: 1000px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
 }
 
-/* Faixa de boas-vindas: azul em degradê, saudação à esquerda e atalhos à direita */
-.boas-vindas {
+/* Faixa de boas-vindas em degradê azul */
+.painel.boas-vindas {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    padding: 28px 32px;
+    gap: 16px;
+    padding: 28px 30px;
+    background: linear-gradient(120deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     border: none;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: #ffffff;
     box-shadow: var(--shadow-lg);
 }
@@ -812,36 +770,29 @@ a.btn {
     font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 0 0 4px 0;
+    margin: 0;
 }
 
 .boas-vindas-data {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 4px 0 0 0;
 }
 
-/* Botões de atalho */
-.acoes-rapidas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* Na faixa azul, o botão principal fica branco... */
+/* Botões sobre o fundo azul */
 .boas-vindas .btn-primario {
     background: #ffffff;
-    color: var(--primary-dark);
+    color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 .boas-vindas .btn-primario:hover {
     background: var(--primary-soft);
 }
 
-/* ...e os secundários ficam translúcidos */
 .boas-vindas .btn-secundario {
     background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.55);
     color: #ffffff;
 }
 
@@ -849,23 +800,25 @@ a.btn {
     background: rgba(255, 255, 255, 0.22);
 }
 
-/* Painéis em colunas: quantas couberem, com no mínimo 290px cada */
-.inicio-grade {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    align-items: start;
-    gap: 24px;
+.acoes-rapidas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-/* Título do painel com um link à direita, separados por uma linha */
+.inicio-grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
 .painel-cabecalho {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding-bottom: 14px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .painel-cabecalho .painel-titulo {
@@ -877,63 +830,57 @@ a.btn {
     font-weight: 600;
     color: var(--primary-color);
     text-decoration: none;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--primary-soft);
     white-space: nowrap;
 }
 
 .painel-link:hover {
-    text-decoration: underline;
+    background: #d5e7f4;
 }
 
-/* Lista de eventos/reservas */
 .lista-eventos {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 
-/* Um item: selo de data + informações; destaca ao passar o mouse */
 .evento-item {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 8px;
-    margin: 0 -8px;
-    border-radius: var(--radius-md);
-    transition: background var(--transicao);
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
 }
 
-.evento-item:hover {
-    background: var(--background-color);
-}
-
-/* Selo com o dia e o mês */
 .data-badge {
+    flex: 0 0 auto;
     width: 50px;
-    flex-shrink: 0;
     padding: 6px 0;
-    text-align: center;
     border-radius: 10px;
     background: var(--primary-soft);
     color: var(--primary-color);
-    border: 1px solid #d3e4f1;
-}
-
-.data-badge-dia {
-    display: block;
-    font-size: 19px;
-    font-weight: 700;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
     line-height: 1.1;
 }
 
+.data-badge-dia {
+    font-size: 17px;
+    font-weight: 700;
+}
+
 .data-badge-mes {
-    display: block;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
 }
 
 .evento-info {
@@ -943,7 +890,7 @@ a.btn {
 .evento-nome {
     font-size: 14px;
     font-weight: 600;
-    margin: 0 0 2px 0;
+    margin: 0;
 }
 
 .evento-detalhe {
@@ -952,163 +899,424 @@ a.btn {
     margin: 0;
 }
 
-/* Dados do usuário: rótulo à esquerda, valor à direita, com linhas divisórias */
+/* Pares "rótulo / valor" (perfil, resultado da portaria) */
 .dados-perfil {
     display: grid;
     grid-template-columns: auto 1fr;
+    gap: 6px 16px;
     margin: 12px 0 0 0;
     font-size: 14px;
 }
 
-.dados-perfil dt,
-.dados-perfil dd {
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
 .dados-perfil dt {
-    font-weight: 500;
     color: var(--muted-color);
-    padding-right: 16px;
+    font-weight: 500;
 }
 
 .dados-perfil dd {
     margin: 0;
     font-weight: 500;
-    overflow-wrap: anywhere;
 }
 
-/* Subtítulo pequeno em letras maiúsculas */
 .subtitulo {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted-color);
-    margin: 22px 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 18px 0 8px 0;
 }
 
-/* Lista de permissões do perfil / dicas de teste */
 .lista-permissoes {
     margin: 0;
     padding-left: 18px;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--muted-color);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
-.lista-permissoes li::marker {
-    color: var(--primary-color);
+/* ---------- 11. Portaria ---------- */
+
+/* Abas Pessoas | Garagem: dois botões grandes lado a lado */
+.abas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 6px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
-/* ---------- 11. Dados para teste ---------- */
-
-/* Na tela de login, ocupa a largura toda abaixo das duas colunas */
-.login > .dados-teste {
-    flex: 1 1 100%;
-    max-width: 824px;
-    box-sizing: border-box;
-}
-
-/* Título clicável que abre/fecha a seção, com a etiqueta "Ambiente de teste" */
-.dados-teste-titulo {
-    cursor: pointer;
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.dados-teste-titulo::after {
-    content: "Ambiente de teste";
-    margin-left: 10px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: #fff4e0;
-    color: #8a5a00;
-    font-size: 11px;
+.aba {
+    font: inherit;
+    font-size: 15px;
     font-weight: 600;
-    vertical-align: middle;
+    color: var(--muted-color);
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background var(--transicao), color var(--transicao);
 }
 
-.dados-teste details[open] .dados-teste-titulo {
+.aba:hover {
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+.aba[aria-selected="true"] {
+    background: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(39, 122, 174, 0.35);
+}
+
+/* Campo + botão na mesma linha; o campo principal é grande e legível */
+.form-consulta {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.form-consulta .campo {
+    flex: 1;
+}
+
+.form-consulta input {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 13px 16px;
+}
+
+.form-consulta .btn {
+    padding: 15px 28px;
+    font-size: 15px;
+}
+
+/* Bloco "Adicionar ..." que abre e fecha */
+.recolhivel {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 6px 24px;
+    box-shadow: var(--shadow-md);
+}
+
+.recolhivel summary {
+    padding: 14px 0;
+    font-size: 15px;
+}
+
+.recolhivel[open] {
+    padding-bottom: 24px;
+}
+
+.recolhivel[open] summary {
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.recolhivel .formulario {
+    margin-top: 16px;
+}
+
+/* Resultado da consulta: bem grande, com um ícone redondo */
+.resultado {
+    margin-top: 20px;
+    padding: 20px 22px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+}
+
+.resultado-ok {
+    background: var(--success-bg);
+    border-color: #b7e2c4;
+}
+
+.resultado-negado,
+.resultado-erro {
+    background: var(--error-bg);
+    border-color: #f1c3c0;
+}
+
+.resultado-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.resultado-titulo::before {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.resultado-ok .resultado-titulo {
+    color: var(--success-text);
+}
+
+.resultado-ok .resultado-titulo::before {
+    content: "✓";
+    background: var(--success-border);
+}
+
+.resultado-negado .resultado-titulo,
+.resultado-erro .resultado-titulo {
+    color: var(--error-text);
+}
+
+.resultado-negado .resultado-titulo::before {
+    content: "✕";
+    background: var(--error-border);
+}
+
+.resultado-erro .resultado-titulo::before {
+    content: "!";
+    background: var(--error-border);
+}
+
+.resultado-texto {
+    font-size: 14px;
+    margin: 8px 0 0 48px;
+}
+
+.resultado .dados-perfil {
+    margin: 14px 0 0 48px;
+    font-size: 15px;
+}
+
+.lista-registros {
+    list-style: none;
+    margin: 14px 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.registro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.registro-nome {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.registro-detalhe {
+    font-size: 12px;
+    color: var(--muted-color);
+    margin: 0;
+}
+
+.tag {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+.tag-ok {
+    background: #d4f0dd;
+    color: var(--success-text);
+}
+
+.tag-negado {
+    background: #fbd9d7;
+    color: var(--error-text);
+}
+
+/* ---------- 12. Menu lateral "Dados mockados" ---------- */
+
+/* Painel fixo na direita; começa escondido fora da tela.
+   O botão (.dados-alca) fica preso à borda esquerda do painel,
+   então aparece na lateral da tela mesmo com o painel fechado. */
+.dados-lateral {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    width: min(560px, 92vw);
+    background: var(--card-background);
+    border-left: 1px solid var(--border-color);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+}
+
+.dados-lateral.aberto {
+    transform: translateX(0);
+    box-shadow: -12px 0 40px rgba(16, 24, 40, 0.18);
+}
+
+.dados-alca {
+    position: absolute;
+    right: 100%;
+    bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: 12px 0 0 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    box-shadow: -4px 4px 16px rgba(23, 73, 107, 0.3);
+    transition: padding var(--transicao);
+}
+
+.dados-alca:hover {
+    padding-right: 24px;
+}
+
+.dados-alca-seta {
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* Conteúdo com rolagem própria. Fechado, fica invisível
+   (assim o Tab do teclado não entra nele). */
+.dados-lateral-conteudo {
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    padding: 20px;
+    visibility: hidden;
+    transition: visibility 0.25s;
+}
+
+.dados-lateral.aberto .dados-lateral-conteudo {
+    visibility: visible;
+}
+
+.dados-lateral-titulo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px 0;
+}
+
+/* Cada seção do menu é um cartão recolhível */
+.dados-secao {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
     margin-bottom: 10px;
 }
 
-/* Contêiner da tabela: bordas arredondadas e rolagem lateral em telas pequenas */
+.dados-secao > :not(summary) {
+    margin-top: 10px;
+}
+
+.dados-lateral .btn-bloco {
+    margin-top: 16px;
+}
+
 .tabela-rolagem {
     overflow-x: auto;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
 }
 
 .tabela {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .tabela th,
 .tabela td {
     text-align: left;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--border-color);
-    vertical-align: top;
-}
-
-/* Cabeçalho da tabela em cinza, letras maiúsculas pequenas */
-.tabela th {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted-color);
-    background: #f8fafc;
     white-space: nowrap;
 }
 
-/* Última linha sem borda (o contêiner já tem) */
-.tabela tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* Linhas alternadas e destaque ao passar o mouse */
-.tabela tbody tr:nth-child(even) {
-    background: #fbfcfd;
-}
-
-.tabela tbody tr:hover {
+.tabela th {
+    font-weight: 600;
+    color: var(--primary-dark);
     background: var(--primary-soft);
 }
 
-/* Botão "Restaurar dados de exemplo" */
-.dados-teste-acoes {
-    margin-top: 20px;
+.tabela tbody tr:nth-child(even) td {
+    background: #ffffff;
 }
 
-/* ---------- 12. Telas pequenas (celular) ---------- */
+/* ---------- 13. Telas pequenas ---------- */
 
-@media (max-width: 600px) {
-    /* Cabeçalho mais compacto */
+@media (max-width: 640px) {
     .topo {
         padding: 10px 16px;
     }
 
-    /* Início e término um embaixo do outro */
-    .campo-linha {
+    .painel.boas-vindas {
+        padding: 22px 20px;
+    }
+
+    .topo-nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0;
+    }
+
+    .topo-link {
+        padding: 8px 12px;
+    }
+
+    .perfis {
         grid-template-columns: 1fr;
     }
 
-    /* Painéis e faixas com menos espaço interno */
-    .painel {
-        padding: 18px;
+    .form-consulta {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .boas-vindas,
-    .login-apresentacao {
-        padding: 24px 20px;
+    .campo-linha {
+        grid-template-columns: 1fr;
     }
+}
 
-    .boas-vindas-titulo {
-        font-size: 22px;
-    }
+/* ---------- Calendário: dias com evento mais visíveis ---------- */
+
+.day.marked {
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+
+.day:hover {
+    background: #d5e7f4;
+}
+
+.day.selected {
+    color: #ffffff;
 }

@@ -1,12 +1,5 @@
-const mockEventos = {
-    "2026-10-14": [
-        { id: "1", titulo: "Aula de natação particular", horario: "08:00 - 10:00", local: "Piscina" },
-        { id: "2", titulo: "Reparo Ar-Condicionado", horario: "10:15 - 12:15", local: "Academia" }
-    ],
-    "2026-10-15": [
-        { id: "3", titulo: "Festa Joao (apt 1401)", horario: "14:00 - 18:00", local: "Salão de Festas" }
-    ]
-};
+// Os eventos de exemplo (mockEventos) ficam em DadosMock.js,
+// que deve ser carregado antes deste arquivo.
 
 
 let currentDate = new Date(2026, 9, 1); 

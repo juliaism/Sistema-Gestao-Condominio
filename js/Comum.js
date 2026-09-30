@@ -15,14 +15,19 @@
 const CHAVE_SESSAO = "condominio:usuario";     // id do usuário logado (sessionStorage)
 const CHAVE_EVENTOS = "condominio:eventos";    // eventos criados pela síndica (localStorage)
 const CHAVE_RESERVAS = "condominio:reservas";  // reservas criadas pelos moradores (localStorage)
+const CHAVE_PESSOAS = "condominio:pessoas";    // pessoas permitidas cadastradas pelo porteiro (localStorage)
+const CHAVE_VEICULOS = "condominio:veiculos";  // veículos permitidos cadastrados pelo porteiro (localStorage)
+const CHAVE_ACESSOS = "condominio:acessos";    // registro de entradas/consultas da portaria (localStorage)
 
 // Páginas que aparecem no menu do cabeçalho.
 // "id" é usado para destacar a página em que o usuário está.
 // "arquivo" é o caminho a partir da raiz do projeto (ver caminho()).
+// "perfis" limita quem vê o link (sem "perfis", todos veem).
 const PAGINAS = [
     { id: "inicio", titulo: "Início", arquivo: "index.html" },
     { id: "calendario", titulo: "Calendário", arquivo: "pages/calendario-condominial.html" },
-    { id: "reservas", titulo: "Reservas", arquivo: "pages/reservas.html" }
+    { id: "reservas", titulo: "Reservas", arquivo: "pages/reservas.html", perfis: ["admin", "morador"] },
+    { id: "portaria", titulo: "Portaria", arquivo: "pages/portaria.html", perfis: ["porteiro"] }
 ];
 
 // Tela de login, a partir da raiz do projeto.
@@ -67,6 +72,8 @@ function salvarArmazenamento(chave, valor) {
     } catch (erro) {
         console.warn("Não foi possível salvar os dados localmente.", erro);
     }
+    // Avisa o painel "Dados mockados" (DadosTeste.js) para se atualizar.
+    window.dispatchEvent(new Event("dados-atualizados"));
 }
 
 // ---------- Sessão (autenticação mockada) ----------
@@ -111,6 +118,13 @@ function usuarioAtual() {
  */
 function ehAdministrador(usuario) {
     return Boolean(usuario) && usuario.perfil === "admin";
+}
+
+/**
+ * Indica se o usuário é porteiro (acesso ao controle de portaria).
+ */
+function ehPorteiro(usuario) {
+    return Boolean(usuario) && usuario.perfil === "porteiro";
 }
 
 /**
@@ -168,6 +182,9 @@ function carregarTodosEventos() {
     if (typeof mockEventos !== "undefined") {
         Object.entries(mockEventos).forEach(([data, lista]) => {
             lista.forEach(evento => {
+                // Eventos registrados pela síndica (id "evt-...") também são copiados
+                // para mockEventos no calendário; aqui vêm só do localStorage.
+                if (String(evento.id).startsWith("evt-")) return;
                 eventos.push({ data, titulo: evento.titulo, horario: evento.horario, local: evento.local });
             });
         });
@@ -200,6 +217,106 @@ function buscarUsuario(usuarioId) {
     return usuariosMock.find(usuario => usuario.id === usuarioId) || null;
 }
 
+// ---------- Portaria: CPF, placas, pessoas e veículos ----------
+
+// Nomes dos tipos de pessoa/veículo permitidos, usados nas telas.
+const TIPOS_ACESSO = {
+    morador: "Morador",
+    visitante: "Visitante",
+    funcionario: "Funcionário"
+};
+
+/**
+ * Deixa só os números de um CPF (ex.: "123.456.789-09" -> "12345678909").
+ */
+function limparCpf(cpf) {
+    return String(cpf || "").replace(/\D/g, "");
+}
+
+/**
+ * Formata 11 números como CPF (ex.: "12345678909" -> "123.456.789-09").
+ * Se não tiver 11 números, devolve o texto como veio.
+ */
+function formatarCpf(cpf) {
+    const n = limparCpf(cpf);
+    if (n.length !== 11) return String(cpf || "");
+    return `${n.slice(0, 3)}.${n.slice(3, 6)}.${n.slice(6, 9)}-${n.slice(9)}`;
+}
+
+/**
+ * Confere se o CPF é válido: 11 números, não repetidos (111.111.111-11)
+ * e com os dois dígitos verificadores corretos.
+ */
+function validarCpf(cpf) {
+    const n = limparCpf(cpf);
+    if (n.length !== 11 || /^(\d)\1{10}$/.test(n)) return false;
+
+    const digito = (tamanho) => {
+        let soma = 0;
+        for (let i = 0; i < tamanho; i++) {
+            soma += Number(n[i]) * (tamanho + 1 - i);
+        }
+        const resto = (soma * 10) % 11;
+        return resto === 10 ? 0 : resto;
+    };
+    return digito(9) === Number(n[9]) && digito(10) === Number(n[10]);
+}
+
+/**
+ * Coloca a placa em maiúsculas e sem hífen/espaços (ex.: "abc-1d23" -> "ABC1D23").
+ */
+function normalizarPlaca(placa) {
+    return String(placa || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+/**
+ * Aceita o padrão antigo (ABC1234) e o Mercosul (ABC1D23).
+ */
+function validarPlaca(placa) {
+    return /^[A-Z]{3}\d[A-Z0-9]\d{2}$/.test(normalizarPlaca(placa));
+}
+
+/**
+ * Mostra a placa como é vista na rua: "ABC-1234" (antiga) ou "ABC1D23" (Mercosul).
+ */
+function formatarPlaca(placa) {
+    const p = normalizarPlaca(placa);
+    return /^[A-Z]{3}\d{4}$/.test(p) ? `${p.slice(0, 3)}-${p.slice(3)}` : p;
+}
+
+/**
+ * Devolve todas as pessoas permitidas no condomínio, no formato
+ * { id, nome, cpf, tipo, detalhe, origem }:
+ *   - os usuários do sistema (moradores, síndica e porteiro);
+ *   - as pessoas mockadas (pessoasMock);
+ *   - as cadastradas pelo porteiro durante o uso (localStorage).
+ */
+function carregarPessoas() {
+    const usuarios = usuariosMock.map(usuario => ({
+        id: usuario.id,
+        nome: usuario.nome,
+        cpf: usuario.cpf,
+        tipo: usuario.perfil === "morador" ? "morador" : "funcionario",
+        detalhe: usuario.apartamento
+            ? `Apto ${usuario.apartamento}`
+            : (usuario.perfil === "porteiro" ? "Portaria" : "Administração"),
+        origem: "Exemplo"
+    }));
+    const exemplos = pessoasMock.map(pessoa => ({ ...pessoa, origem: "Exemplo" }));
+    const criadas = lerArmazenamento(CHAVE_PESSOAS, []).map(pessoa => ({ ...pessoa, origem: "Cadastrada" }));
+    return usuarios.concat(exemplos, criadas);
+}
+
+/**
+ * Devolve todos os veículos permitidos (mockados + cadastrados pelo porteiro),
+ * no formato { id, placa, modelo, cor, tipo, proprietario, detalhe, origem }.
+ */
+function carregarVeiculos() {
+    const exemplos = veiculosMock.map(veiculo => ({ ...veiculo, origem: "Exemplo" }));
+    const criados = lerArmazenamento(CHAVE_VEICULOS, []).map(veiculo => ({ ...veiculo, origem: "Cadastrado" }));
+    return exemplos.concat(criados);
+}
+
 // ---------- Cabeçalho ----------
 
 /**
@@ -225,7 +342,7 @@ function renderizarTopo(paginaAtiva) {
     // Menu com um link para cada página
     const nav = document.createElement("nav");
     nav.className = "topo-nav";
-    PAGINAS.forEach(pagina => {
+    PAGINAS.filter(pagina => !pagina.perfis || pagina.perfis.includes(usuario.perfil)).forEach(pagina => {
         const link = document.createElement("a");
         link.className = "topo-link";
         link.href = caminho(pagina.arquivo);

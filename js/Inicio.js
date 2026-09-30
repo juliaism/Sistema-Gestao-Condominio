@@ -3,12 +3,13 @@
  * ------------------------------------------------------------------
  * Página inicial (index.html, na raiz do projeto), exibida logo após o login.
  * Mostra, de acordo com o perfil do usuário:
- *   - saudação, data de hoje e atalhos (a síndica tem "Registrar evento");
+ *   - saudação, data de hoje e atalhos (a síndica tem "Registrar evento";
+ *     o porteiro tem "Abrir portaria");
  *   - próximos eventos do condomínio;
- *   - reservas (morador: as próprias; síndica: todas as do condomínio);
+ *   - reservas (morador: as próprias; síndica e porteiro: todas as do condomínio);
  *   - dados do usuário e permissões do perfil.
  *
- * Depende de DadosMock.js, Comum.js e Calendario.js (usa mockEventos).
+ * Depende de DadosMock.js e Comum.js.
  */
 
 // Quantidade máxima de itens exibidos em cada lista.
@@ -29,6 +30,14 @@ const tituloReservas = document.getElementById("titulo-reservas");
 const listaReservasInicio = document.getElementById("lista-reservas-inicio");
 const dadosPerfil = document.getElementById("dados-perfil");
 const listaPermissoes = document.getElementById("permissoes");
+const linkNovaReserva = document.getElementById("link-nova-reserva");
+
+/**
+ * Síndica e porteiro veem as reservas de todos; o morador, só as dele.
+ */
+function veTodasReservas(usuario) {
+    return ehAdministrador(usuario) || ehPorteiro(usuario);
+}
 
 /**
  * Devolve os eventos do condomínio de hoje em diante
@@ -41,13 +50,13 @@ function carregarProximosEventos() {
 
 /**
  * Devolve as reservas futuras que o usuário deve ver:
- * a síndica vê todas; o morador vê apenas as dele.
+ * síndica e porteiro veem todas; o morador vê apenas as dele.
  */
 function carregarReservasVisiveis() {
     const hoje = dataDeHoje();
     return carregarReservas()
         .filter(reserva => reserva.data >= hoje)
-        .filter(reserva => ehAdministrador(usuarioLogado) || reserva.moradorId === usuarioLogado.id)
+        .filter(reserva => veTodasReservas(usuarioLogado) || reserva.moradorId === usuarioLogado.id)
         .sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario));
 }
 
@@ -132,7 +141,11 @@ function renderizarAcoesRapidas() {
     if (ehAdministrador(usuarioLogado)) {
         acoes.push({ texto: "Registrar evento", destino: caminho("pages/calendario-condominial.html#novo-evento"), principal: true });
     }
-    acoes.push({ texto: "Reservar área comum", destino: caminho("pages/reservas.html"), principal: !ehAdministrador(usuarioLogado) });
+    if (ehPorteiro(usuarioLogado)) {
+        acoes.push({ texto: "Abrir portaria", destino: caminho("pages/portaria.html"), principal: true });
+    } else {
+        acoes.push({ texto: "Reservar área comum", destino: caminho("pages/reservas.html"), principal: !ehAdministrador(usuarioLogado) });
+    }
     acoes.push({ texto: "Ver calendário", destino: caminho("pages/calendario-condominial.html"), principal: false });
 
     acoesRapidas.innerHTML = "";
@@ -169,8 +182,11 @@ function renderizarProximosEventos() {
  */
 function renderizarReservas() {
     listaReservasInicio.innerHTML = "";
-    const admin = ehAdministrador(usuarioLogado);
+    const admin = veTodasReservas(usuarioLogado);
     tituloReservas.textContent = admin ? "Reservas do condomínio" : "Minhas reservas";
+
+    // O porteiro só consulta as reservas; quem reserva é síndica ou morador.
+    if (ehPorteiro(usuarioLogado)) linkNovaReserva.classList.add("hidden");
 
     const reservas = carregarReservasVisiveis();
     if (reservas.length === 0) {

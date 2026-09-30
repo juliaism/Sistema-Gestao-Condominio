@@ -1,47 +1,35 @@
 /*
  * DadosTeste.js
  * ------------------------------------------------------------------
- * Mostra na página, em tabelas, todos os dados mockados do sistema,
- * para que a equipe saiba com quais dados testar:
- *   - dicas de teste;
- *   - usuários (com e-mail e senha);
- *   - áreas comuns e seus horários;
- *   - reservas já existentes (úteis para testar conflito de horário);
- *   - eventos do calendário.
- * Também oferece um botão para restaurar os dados de exemplo
+ * Menu lateral "Dados mockados", presente em todas as telas.
+ * Fica fechado na borda direita da tela, como um botão "‹ Dados mockados".
+ * Ao clicar, abre um painel com os dados salvos no sistema:
+ *   - como testar;
+ *   - usuários (com CPF, e-mail e senha);
+ *   - pessoas permitidas (CPF) e veículos permitidos (placa);
+ *   - áreas comuns, reservas e eventos do calendário.
+ * Também tem um botão para restaurar os dados de exemplo
  * (apaga o que foi criado durante os testes).
  *
- * É usado em pages/login.html e em index.html, dentro do elemento
- * <div id="dados-teste">. Depende de DadosMock.js e Comum.js; os
- * eventos de exemplo aparecem quando Calendario.js também é carregado.
+ * O painel é criado por este script (não precisa de HTML na página) e se
+ * atualiza sozinho quando algo é salvo (evento "dados-atualizados",
+ * disparado por salvarArmazenamento em Comum.js).
+ *
+ * Depende de DadosMock.js e Comum.js.
  */
-
-// Onde as tabelas serão desenhadas.
-const containerDadosTeste = document.getElementById("dados-teste");
 
 /**
- * Cria um subtítulo seguido de uma tabela.
- * - titulo:     texto do subtítulo
+ * Cria uma tabela com cabeçalho. Devolve um parágrafo quando não há linhas.
  * - cabecalhos: nomes das colunas
  * - linhas:     lista de linhas; cada linha é uma lista de textos
- * - textoVazio: mensagem exibida quando não há linhas
- * A tabela fica dentro de uma <div> com rolagem horizontal,
- * para não quebrar o layout em telas pequenas.
+ * A tabela fica numa <div> com rolagem horizontal, para telas pequenas.
  */
-function criarTabela(titulo, cabecalhos, linhas, textoVazio) {
-    const bloco = document.createDocumentFragment();
-
-    const subtitulo = document.createElement("h3");
-    subtitulo.className = "subtitulo";
-    subtitulo.textContent = titulo;
-    bloco.appendChild(subtitulo);
-
+function criarTabela(cabecalhos, linhas, textoVazio) {
     if (linhas.length === 0) {
         const vazio = document.createElement("p");
         vazio.className = "lista-vazia";
         vazio.textContent = textoVazio;
-        bloco.appendChild(vazio);
-        return bloco;
+        return vazio;
     }
 
     const rolagem = document.createElement("div");
@@ -50,7 +38,6 @@ function criarTabela(titulo, cabecalhos, linhas, textoVazio) {
     const tabela = document.createElement("table");
     tabela.className = "tabela";
 
-    // Linha de cabeçalho
     const thead = document.createElement("thead");
     const linhaCabecalho = document.createElement("tr");
     cabecalhos.forEach(texto => {
@@ -61,7 +48,6 @@ function criarTabela(titulo, cabecalhos, linhas, textoVazio) {
     });
     thead.appendChild(linhaCabecalho);
 
-    // Linhas de dados
     const tbody = document.createElement("tbody");
     linhas.forEach(linha => {
         const tr = document.createElement("tr");
@@ -75,14 +61,26 @@ function criarTabela(titulo, cabecalhos, linhas, textoVazio) {
 
     tabela.append(thead, tbody);
     rolagem.appendChild(tabela);
-    bloco.appendChild(rolagem);
-    return bloco;
+    return rolagem;
+}
+
+/**
+ * Cria uma seção recolhível (<details>) com título e conteúdo.
+ */
+function criarSecao(titulo, conteudo, aberta) {
+    const secao = document.createElement("details");
+    secao.className = "dados-secao";
+    secao.open = Boolean(aberta);
+
+    const resumo = document.createElement("summary");
+    resumo.textContent = titulo;
+
+    secao.append(resumo, conteudo);
+    return secao;
 }
 
 /**
  * Lista de dicas com o passo a passo para testar cada funcionalidade.
- * A dica de conflito usa a primeira reserva mockada, para sempre
- * apontar um horário que realmente está ocupado.
  */
 function criarDicas() {
     const reservaOcupada = reservasMock[0];
@@ -90,18 +88,12 @@ function criarDicas() {
     const donoReserva = buscarUsuario(reservaOcupada.moradorId);
 
     const dicas = [
-        "Registrar evento: entre como Síndica, clique em \"Registrar evento\", preencha e salve. O dia fica marcado no calendário.",
+        "Portaria: entre como Porteiro, abra a aba Pessoas e digite um CPF da tabela abaixo. Para testar um CPF não cadastrado, use 111.444.777-35.",
+        "Garagem: na aba Garagem, digite uma placa da tabela de veículos. Para testar uma placa não cadastrada, use XYZ9K87.",
+        "Registrar evento: entre como Síndica, clique em \"Registrar evento\", preencha e salve.",
         "Acesso negado: entre como Morador e clique em \"Registrar evento\" no calendário.",
-        "Reserva confirmada: em Reservas, escolha uma área, uma data futura e um horário \"Disponível\".",
         `Conflito de horário: tente reservar ${areaOcupada.nome} em ${formatarDataBR(reservaOcupada.data)}, horário ${reservaOcupada.horario} (já reservado por ${donoReserva.nome}).`
     ];
-
-    const bloco = document.createDocumentFragment();
-
-    const subtitulo = document.createElement("h3");
-    subtitulo.className = "subtitulo";
-    subtitulo.textContent = "Como testar";
-    bloco.appendChild(subtitulo);
 
     const lista = document.createElement("ul");
     lista.className = "lista-permissoes";
@@ -110,70 +102,74 @@ function criarDicas() {
         item.textContent = texto;
         lista.appendChild(item);
     });
-    bloco.appendChild(lista);
-
-    return bloco;
+    return lista;
 }
 
 /**
- * Botão que apaga os eventos e reservas criados durante os testes
- * (localStorage) e recarrega a página com apenas os dados de exemplo.
+ * Botão que apaga tudo o que foi criado durante os testes (localStorage)
+ * e recarrega a página com apenas os dados de exemplo.
  */
 function criarBotaoRestaurar() {
-    const acoes = document.createElement("div");
-    acoes.className = "dados-teste-acoes";
-
     const botao = document.createElement("button");
     botao.type = "button";
-    botao.className = "btn btn-secundario";
+    botao.className = "btn btn-secundario btn-bloco";
     botao.textContent = "Restaurar dados de exemplo";
     botao.addEventListener("click", () => {
-        const confirmou = window.confirm("Apagar os eventos e reservas criados durante os testes?");
+        const confirmou = window.confirm("Apagar os eventos, reservas, pessoas, veículos e registros criados durante os testes?");
         if (!confirmou) return;
 
         try {
-            localStorage.removeItem(CHAVE_EVENTOS);
-            localStorage.removeItem(CHAVE_RESERVAS);
+            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS]
+                .forEach(chave => localStorage.removeItem(chave));
         } catch (erro) {
             console.warn("Não foi possível limpar os dados locais.", erro);
         }
         window.location.reload();
     });
-
-    acoes.appendChild(botao);
-    return acoes;
+    return botao;
 }
 
 /**
- * Monta todas as seções de dados de teste.
+ * Monta o conteúdo do painel com os dados atuais.
  */
-function renderizarDadosTeste() {
-    if (!containerDadosTeste) return;
-    containerDadosTeste.innerHTML = "";
+function montarDadosMockados(corpo) {
+    corpo.innerHTML = "";
 
-    // Ids das reservas de exemplo, para diferenciar das criadas nos testes
-    const idsExemplo = reservasMock.map(reserva => reserva.id);
+    const idsReservasExemplo = reservasMock.map(reserva => reserva.id);
 
-    // Usuários: nome, perfil, apartamento, e-mail e senha
     const linhasUsuarios = usuariosMock.map(usuario => {
         const perfil = buscarPerfil(usuario);
         return [
             usuario.nome,
             perfil ? perfil.nome : usuario.cargo,
-            usuario.apartamento || "-",
+            formatarCpf(usuario.cpf),
             usuario.email,
             usuario.senha
         ];
     });
 
-    // Áreas comuns: nome, capacidade e horários disponíveis para reserva
+    const linhasPessoas = carregarPessoas().map(pessoa => [
+        pessoa.nome,
+        formatarCpf(pessoa.cpf),
+        TIPOS_ACESSO[pessoa.tipo] || pessoa.tipo,
+        pessoa.detalhe || "-",
+        pessoa.origem
+    ]);
+
+    const linhasVeiculos = carregarVeiculos().map(veiculo => [
+        formatarPlaca(veiculo.placa),
+        veiculo.cor ? `${veiculo.modelo} (${veiculo.cor})` : veiculo.modelo,
+        TIPOS_ACESSO[veiculo.tipo] || veiculo.tipo,
+        veiculo.proprietario,
+        veiculo.origem
+    ]);
+
     const linhasAreas = areasComunsMock.map(area => [
         area.nome,
         `${area.capacidade} pessoas`,
         area.horarios.join(", ")
     ]);
 
-    // Reservas existentes (exemplo + criadas nos testes), por data
     const linhasReservas = carregarReservas()
         .sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario))
         .map(reserva => {
@@ -184,11 +180,10 @@ function renderizarDadosTeste() {
                 formatarDataBR(reserva.data),
                 reserva.horario,
                 morador ? morador.nome : reserva.moradorId,
-                idsExemplo.includes(reserva.id) ? "Exemplo" : "Criada no teste"
+                idsReservasExemplo.includes(reserva.id) ? "Exemplo" : "Criada"
             ];
         });
 
-    // Eventos do calendário (exemplo + registrados pela síndica)
     const linhasEventos = carregarTodosEventos().map(evento => [
         formatarDataBR(evento.data),
         evento.titulo,
@@ -196,14 +191,77 @@ function renderizarDadosTeste() {
         evento.local
     ]);
 
-    containerDadosTeste.append(
-        criarDicas(),
-        criarTabela("Usuários", ["Nome", "Perfil", "Apto", "E-mail", "Senha"], linhasUsuarios, "Nenhum usuário."),
-        criarTabela("Áreas comuns", ["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."),
-        criarTabela("Reservas existentes", ["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."),
-        criarTabela("Eventos do calendário", ["Data", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."),
+    corpo.append(
+        criarSecao("Como testar", criarDicas(), true),
+        criarSecao("Usuários", criarTabela(["Nome", "Perfil", "CPF", "E-mail", "Senha"], linhasUsuarios, "Nenhum usuário."), true),
+        criarSecao("Pessoas permitidas", criarTabela(["Nome", "CPF", "Tipo", "Destino", "Origem"], linhasPessoas, "Nenhuma pessoa."), false),
+        criarSecao("Veículos permitidos", criarTabela(["Placa", "Veículo", "Tipo", "Proprietário", "Origem"], linhasVeiculos, "Nenhum veículo."), false),
+        criarSecao("Áreas comuns", criarTabela(["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."), false),
+        criarSecao("Reservas", criarTabela(["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."), false),
+        criarSecao("Eventos do calendário", criarTabela(["Data", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
         criarBotaoRestaurar()
     );
 }
 
-renderizarDadosTeste();
+/**
+ * Cria o menu lateral, fechado, e liga o botão que abre e fecha.
+ */
+function criarMenuDados() {
+    const menu = document.createElement("aside");
+    menu.className = "dados-lateral";
+    menu.id = "dados-lateral";
+    menu.setAttribute("aria-label", "Dados mockados");
+
+    // Botão que fica na borda da tela: "‹ Dados mockados" (fechado) / "› Fechar" (aberto)
+    const alca = document.createElement("button");
+    alca.type = "button";
+    alca.className = "dados-alca";
+    alca.setAttribute("aria-expanded", "false");
+    alca.setAttribute("aria-controls", "dados-lateral-corpo");
+
+    const seta = document.createElement("span");
+    seta.className = "dados-alca-seta";
+    seta.textContent = "‹";
+    const rotulo = document.createElement("span");
+    rotulo.textContent = "Dados mockados";
+    alca.append(seta, rotulo);
+
+    const conteudo = document.createElement("div");
+    conteudo.className = "dados-lateral-conteudo";
+    conteudo.id = "dados-lateral-corpo";
+
+    const titulo = document.createElement("h2");
+    titulo.className = "dados-lateral-titulo";
+    titulo.textContent = "Dados mockados";
+    const texto = document.createElement("p");
+    texto.className = "painel-texto";
+    texto.textContent = "Dados salvos neste navegador. O que for criado nos testes aparece aqui.";
+    const corpo = document.createElement("div");
+
+    conteudo.append(titulo, texto, corpo);
+    menu.append(alca, conteudo);
+    document.body.appendChild(menu);
+
+    function aberto() {
+        return menu.classList.contains("aberto");
+    }
+
+    function alternar(abrir) {
+        menu.classList.toggle("aberto", abrir);
+        alca.setAttribute("aria-expanded", String(abrir));
+        seta.textContent = abrir ? "›" : "‹";
+        rotulo.textContent = abrir ? "Fechar" : "Dados mockados";
+        if (abrir) montarDadosMockados(corpo);
+    }
+
+    alca.addEventListener("click", () => alternar(!aberto()));
+    document.addEventListener("keydown", (evento) => {
+        if (evento.key === "Escape" && aberto()) alternar(false);
+    });
+    // Atualiza as tabelas quando algo é salvo com o menu aberto.
+    window.addEventListener("dados-atualizados", () => {
+        if (aberto()) montarDadosMockados(corpo);
+    });
+}
+
+criarMenuDados();

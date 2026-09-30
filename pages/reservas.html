@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+    reservas.html
+    Tela de reserva de áreas comuns. O morador escolhe a área, a data
+    e um horário; a lógica (disponibilidade e conflitos) está em Reservas.js.
+
+    data-raiz="../" no <body>: esta página está um nível abaixo da raiz
+    (usado por caminho() em Comum.js para montar os links).
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas | Gestão Condominial</title>
+    <!-- Estilos compartilhados das telas do sistema -->
+    <link rel="stylesheet" href="../css/Sistema.css" />
+</head>
+<body data-raiz="../">
+    <!-- Cabeçalho com menu e usuário logado, montado por renderizarTopo() em Comum.js -->
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="layout">
+
+            <!-- Painel do formulário de reserva -->
+            <section class="painel">
+                <h1 class="painel-titulo">Reservar área comum</h1>
+                <p class="painel-texto">Escolha a área, a data e um horário disponível.</p>
+
+                <!-- Mensagens de confirmação, conflito de horário ou erro de validação -->
+                <div id="mensagem-reserva" class="mensagem hidden" role="alert"></div>
+
+                <form id="form-reserva" class="formulario" novalidate>
+                    <!-- Opções de área preenchidas por Reservas.js a partir de areasComunsMock -->
+                    <label class="campo">
+                        Área comum
+                        <select id="area-reserva" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                        <!-- Mostra a capacidade da área escolhida -->
+                        <span id="info-area" class="campo-ajuda"></span>
+                    </label>
+                    <label class="campo">
+                        Data
+                        <input type="date" id="data-reserva" required>
+                    </label>
+                    <!-- Botões de horário (Disponível/Ocupado), gerados por Reservas.js -->
+                    <fieldset class="campo">
+                        <legend>Horário</legend>
+                        <div id="lista-horarios" class="lista-horarios"></div>
+                    </fieldset>
+                    <button type="submit" class="btn btn-primario">Confirmar reserva</button>
+                </form>
+            </section>
+
+            <!-- Painel com as próximas reservas do morador logado -->
+            <section class="painel">
+                <h2 class="painel-titulo">Minhas reservas</h2>
+                <ul id="minhas-reservas" class="lista-reservas"></ul>
+            </section>
+        </div>
+    </main>
+
+    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela -->
+    <script src="../js/DadosMock.js"></script>
+    <script src="../js/Comum.js"></script>
+    <script src="../js/Reservas.js"></script>
+</body>
+</html>

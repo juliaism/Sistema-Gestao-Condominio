@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="Calendario.css" />
+</head>
+<body>
+    <div class="container">
+        <h1 class="header-title" style="text-align: center;">Calendário</h1>
+        
+        <div class="calendar-navigation">
+            <button id="prev-month" class="arrow-btn">&lt;</button>
+            <span id="month-title">Outubro 2026</span>
+            <button id="next-month" class="arrow-btn">&gt;</button>
+        </div>
+
+        <div class="calendar-grid">
+            <div class="day-name">Dom</div>
+            <div class="day-name">Seg</div>
+            <div class="day-name">Ter</div>
+            <div class="day-name">Qua</div>
+            <div class="day-name">Qui</div>
+            <div class="day-name">Sex</div>
+            <div class="day-name">Sáb</div>
+
+            <div id="calendar-days" class="days-container"></div>
+
+        </div>
+        
+            <button id="add-event" disabled>Adicionar Evento</button>
+
+        <div id="list-container" class="list-container hidden">
+            <h2 id="calendar-description" class="calendar-description">Eventos em:</h2>
+            <div id="events-list"></div>
+        </div>
+    </div>
+    
+    <script src="Calendario.js"></script>
+</body>
+</html>

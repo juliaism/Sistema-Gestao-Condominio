@@ -1,42 +1,92 @@
 <!DOCTYPE html>
+<!--
+    index.html
+    Ponto de entrada do sistema e página inicial após o login (fora do
+    calendário). Se ninguém estiver logado, redireciona para pages/login.html.
+    Reúne as informações principais do usuário: saudação, atalhos, próximos
+    eventos do condomínio, reservas e dados/permissões do perfil. O conteúdo
+    muda conforme o perfil (Síndica ou Morador) e é montado por Inicio.js.
+    No final da página ficam os dados mockados, para facilitar os testes.
+
+    data-raiz="" no <body>: esta página está na raiz do projeto
+    (usado por caminho() em Comum.js para montar os links).
+-->
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="Calendario.css" />
+    <title>Início | Gestão Condominial</title>
+    <!-- Estilos compartilhados das telas do sistema -->
+    <link rel="stylesheet" href="css/Sistema.css" />
 </head>
-<body>
-    <div class="container">
-        <h1 class="header-title" style="text-align: center;">Calendário</h1>
-        
-        <div class="calendar-navigation">
-            <button id="prev-month" class="arrow-btn">&lt;</button>
-            <span id="month-title">Outubro 2026</span>
-            <button id="next-month" class="arrow-btn">&gt;</button>
+<body data-raiz="">
+    <!-- Cabeçalho com menu e usuário logado, montado por renderizarTopo() em Comum.js -->
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="inicio">
+
+            <!-- Saudação, data de hoje e atalhos para as ações do perfil -->
+            <section class="painel boas-vindas">
+                <div>
+                    <h1 id="saudacao" class="boas-vindas-titulo">Olá!</h1>
+                    <p id="data-hoje" class="boas-vindas-data"></p>
+                </div>
+                <div id="acoes-rapidas" class="acoes-rapidas"></div>
+            </section>
+
+            <!-- Grade com os painéis de informação -->
+            <div class="inicio-grade">
+
+                <!-- Próximos eventos do condomínio (os mesmos do calendário) -->
+                <section class="painel">
+                    <div class="painel-cabecalho">
+                        <h2 class="painel-titulo">Próximos eventos</h2>
+                        <a class="painel-link" href="pages/calendario-condominial.html">Ver calendário</a>
+                    </div>
+                    <ul id="proximos-eventos" class="lista-eventos"></ul>
+                </section>
+
+                <!-- Reservas: as do morador, ou todas no caso da síndica -->
+                <section class="painel">
+                    <div class="painel-cabecalho">
+                        <h2 id="titulo-reservas" class="painel-titulo">Minhas reservas</h2>
+                        <a class="painel-link" href="pages/reservas.html">Nova reserva</a>
+                    </div>
+                    <ul id="lista-reservas-inicio" class="lista-eventos"></ul>
+                </section>
+
+                <!-- Dados do usuário e permissões do perfil -->
+                <section class="painel">
+                    <h2 class="painel-titulo">Seu perfil</h2>
+                    <dl id="dados-perfil" class="dados-perfil"></dl>
+                    <h3 class="subtitulo">O que você pode fazer</h3>
+                    <ul id="permissoes" class="lista-permissoes"></ul>
+                </section>
+            </div>
+
+            <!-- Dados mockados exibidos para a equipe testar o sistema
+                 (tabelas montadas por DadosTeste.js) -->
+            <section class="painel dados-teste">
+                <details>
+                    <summary class="dados-teste-titulo">Dados para teste (mockados)</summary>
+                    <p class="painel-texto">
+                        Usuários, áreas, reservas e eventos disponíveis para testar o sistema.
+                        O que for criado durante os testes fica salvo apenas neste navegador.
+                    </p>
+                    <div id="dados-teste"></div>
+                </details>
+            </section>
         </div>
+    </main>
 
-        <div class="calendar-grid">
-            <div class="day-name">Dom</div>
-            <div class="day-name">Seg</div>
-            <div class="day-name">Ter</div>
-            <div class="day-name">Qua</div>
-            <div class="day-name">Qui</div>
-            <div class="day-name">Sex</div>
-            <div class="day-name">Sáb</div>
-
-            <div id="calendar-days" class="days-container"></div>
-
-        </div>
-        
-            <button id="add-event" disabled>Adicionar Evento</button>
-
-        <div id="list-container" class="list-container hidden">
-            <h2 id="calendar-description" class="calendar-description">Eventos em:</h2>
-            <div id="events-list"></div>
-        </div>
-    </div>
-    
-    <script src="Calendario.js"></script>
+    <!-- Ordem importa. Calendario.js é carregado apenas para ler os eventos
+         de exemplo (mockEventos); nesta página ele não desenha o calendário,
+         pois os elementos do calendário não existem aqui. -->
+    <script src="js/DadosMock.js"></script>
+    <script src="js/Comum.js"></script>
+    <script src="js/Calendario.js"></script>
+    <script src="js/Inicio.js"></script>
+    <script src="js/DadosTeste.js"></script>
 </body>
 </html>

@@ -5,8 +5,9 @@ descricao
 
 
 ## Tecnologias Utilizadas<br>
-| Tecnologia | Tipo | Descrição |
-|---|---|---|
+- HTML<br>
+- CSS<br>
+- JAVASCRIPT<br> 
 
 
 ## **Estrutura do Projeto**<br>

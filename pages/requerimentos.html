@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requerimentos | Gestão Condominial</title>
+    <link rel="stylesheet" href="../css/Sistema.css" />
+</head>
+<body data-raiz="../">
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="layout">
+            <!-- Painel de Criação de Requerimento -->
+            <section class="painel">
+                <h1 class="painel-titulo">Novo Requerimento</h1>
+                <p class="painel-texto">Selecione o tipo e descreva sua solicitação para a administração.</p>
+
+                <div id="mensagem-requerimento" class="mensagem hidden" role="alert"></div>
+
+                <form id="form-requerimento" class="formulario" novalidate>
+                    <!-- CARTÃO 1: Seleção do Tipo de Requerimento -->
+                    <label class="campo">
+                        Tipo de Requerimento *
+                        <select id="requerimento-tipo" required>
+                            <option value="">-- Selecione o tipo --</option>
+                        </select>
+                    </label>
+
+                    <!-- CARTÃO 2: Escrita do Requerimento -->
+                    <label class="campo">
+                        Descrição do Requerimento *
+                        <textarea id="requerimento-texto" rows="5" placeholder="Escreva aqui os detalhes da sua solicitação..." required></textarea>
+                    </label>
+
+                    <button type="submit" class="btn btn-primario">Enviar Requerimento</button>
+                </form>
+            </section>
+
+            <!-- Lista de Requerimentos Enviados -->
+            <section class="painel">
+                <h2 class="painel-titulo">Os Meus Requerimentos</h2>
+                <ul id="lista-requerimentos" class="lista-registros"></ul>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/DadosMock.js"></script>
+    <script src="../js/Comum.js"></script>
+    <script src="../js/DadosTeste.js"></script>
+    <script src="../js/Requerimentos.js"></script>
+</body>
+</html>

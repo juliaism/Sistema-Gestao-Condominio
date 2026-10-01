@@ -2,29 +2,8 @@
  * DadosTeste.js
  * ------------------------------------------------------------------
  * Menu lateral "Dados mockados", presente em todas as telas.
- * Fica fechado na borda direita da tela, como um botão "‹ Dados mockados".
- * Ao clicar, abre um painel com os dados salvos no sistema:
- *   - como testar;
- *   - usuários (com CPF, e-mail e senha);
- *   - pessoas permitidas (CPF) e veículos permitidos (placa);
- *   - correspondências recebidas na portaria;
- *   - áreas comuns, reservas e eventos do calendário.
- * Também tem um botão para restaurar os dados de exemplo
- * (apaga o que foi criado durante os testes).
- *
- * O painel é criado por este script (não precisa de HTML na página) e se
- * atualiza sozinho quando algo é salvo (evento "dados-atualizados",
- * disparado por salvarArmazenamento em Comum.js).
- *
- * Depende de DadosMock.js e Comum.js.
  */
 
-/**
- * Cria uma tabela com cabeçalho. Devolve um parágrafo quando não há linhas.
- * - cabecalhos: nomes das colunas
- * - linhas:     lista de linhas; cada linha é uma lista de textos
- * A tabela fica numa <div> com rolagem horizontal, para telas pequenas.
- */
 function criarTabela(cabecalhos, linhas, textoVazio) {
     if (linhas.length === 0) {
         const vazio = document.createElement("p");
@@ -65,9 +44,6 @@ function criarTabela(cabecalhos, linhas, textoVazio) {
     return rolagem;
 }
 
-/**
- * Cria uma seção recolhível (<details>) com título e conteúdo.
- */
 function criarSecao(titulo, conteudo, aberta) {
     const secao = document.createElement("details");
     secao.className = "dados-secao";
@@ -80,9 +56,6 @@ function criarSecao(titulo, conteudo, aberta) {
     return secao;
 }
 
-/**
- * Lista de dicas com o passo a passo para testar cada funcionalidade.
- */
 function criarDicas() {
     const reservaOcupada = reservasMock[0];
     const areaOcupada = buscarArea(reservaOcupada.areaId);
@@ -109,21 +82,17 @@ function criarDicas() {
     return lista;
 }
 
-/**
- * Botão que apaga tudo o que foi criado durante os testes (localStorage)
- * e recarrega a página com apenas os dados de exemplo.
- */
 function criarBotaoRestaurar() {
     const botao = document.createElement("button");
     botao.type = "button";
     botao.className = "btn btn-secundario btn-bloco";
     botao.textContent = "Restaurar dados de exemplo";
     botao.addEventListener("click", () => {
-        const confirmou = window.confirm("Apagar os eventos, reservas, pessoas, veículos, correspondências e registros criados durante os testes?");
+        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos, correspondências e registros criados durante os testes?");
         if (!confirmou) return;
 
         try {
-            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS, CHAVE_CORRESPONDENCIAS]
+            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS, CHAVE_CORRESPONDENCIAS]
                 .forEach(chave => localStorage.removeItem(chave));
         } catch (erro) {
             console.warn("Não foi possível limpar os dados locais.", erro);
@@ -133,9 +102,6 @@ function criarBotaoRestaurar() {
     return botao;
 }
 
-/**
- * Monta o conteúdo do painel com os dados atuais.
- */
 function montarDadosMockados(corpo) {
     corpo.innerHTML = "";
 
@@ -206,6 +172,18 @@ function montarDadosMockados(corpo) {
         evento.local
     ]);
 
+    const linhasRequerimentos = carregarRequerimentos().map(req => {
+        const tipoObj = tiposRequerimentoMock.find(t => t.id === req.tipo);
+        const morador = buscarUsuario(req.moradorId);
+        return [
+            tipoObj ? tipoObj.nome : req.tipo,
+            req.descricao,
+            morador ? morador.nome : req.moradorId,
+            formatarDataBR(req.data),
+            req.status
+        ];
+    });
+
     corpo.append(
         criarSecao("Como testar", criarDicas(), true),
         criarSecao("Usuários", criarTabela(["Nome", "Perfil", "CPF", "E-mail", "Senha"], linhasUsuarios, "Nenhum usuário."), true),
@@ -215,20 +193,17 @@ function montarDadosMockados(corpo) {
         criarSecao("Áreas comuns", criarTabela(["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."), false),
         criarSecao("Reservas", criarTabela(["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."), false),
         criarSecao("Eventos do calendário", criarTabela(["Data", "Tipo", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
+        criarSecao("Requerimentos", criarTabela(["Tipo", "Descrição", "Morador", "Data", "Estado"], linhasRequerimentos, "Nenum requerimento."), false),
         criarBotaoRestaurar()
     );
 }
 
-/**
- * Cria o menu lateral, fechado, e liga o botão que abre e fecha.
- */
 function criarMenuDados() {
     const menu = document.createElement("aside");
     menu.className = "dados-lateral";
     menu.id = "dados-lateral";
     menu.setAttribute("aria-label", "Dados mockados");
 
-    // Botão que fica na borda da tela: "‹ Dados mockados" (fechado) / "› Fechar" (aberto)
     const alca = document.createElement("button");
     alca.type = "button";
     alca.className = "dados-alca";
@@ -274,7 +249,6 @@ function criarMenuDados() {
     document.addEventListener("keydown", (evento) => {
         if (evento.key === "Escape" && aberto()) alternar(false);
     });
-    // Atualiza as tabelas quando algo é salvo com o menu aberto.
     window.addEventListener("dados-atualizados", () => {
         if (aberto()) montarDadosMockados(corpo);
     });

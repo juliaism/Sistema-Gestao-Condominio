@@ -90,7 +90,8 @@ function criarDicas() {
     const dicas = [
         "Portaria: entre como Porteiro, abra a aba Pessoas e digite um CPF da tabela abaixo. Para testar um CPF não cadastrado, use 111.444.777-35.",
         "Garagem: na aba Garagem, digite uma placa da tabela de veículos. Para testar uma placa não cadastrada, use XYZ9K87.",
-        "Registrar evento: entre como Síndica, clique em \"Registrar evento\", preencha e salve.",
+        "Registrar evento: entre como Síndica, clique em \"Registrar evento\", escolha o tipo (Aviso, Manutenção, Assembleia ou Evento), preencha e salve.",
+        "Reservas no calendário: as reservas de áreas comuns aparecem no calendário com a etiqueta \"Reserva\".",
         "Acesso negado: entre como Morador e clique em \"Registrar evento\" no calendário.",
         `Conflito de horário: tente reservar ${areaOcupada.nome} em ${formatarDataBR(reservaOcupada.data)}, horário ${reservaOcupada.horario} (já reservado por ${donoReserva.nome}).`
     ];
@@ -186,6 +187,7 @@ function montarDadosMockados(corpo) {
 
     const linhasEventos = carregarTodosEventos().map(evento => [
         formatarDataBR(evento.data),
+        nomeTipoEvento(evento.tipo),
         evento.titulo,
         evento.horario,
         evento.local
@@ -198,7 +200,7 @@ function montarDadosMockados(corpo) {
         criarSecao("Veículos permitidos", criarTabela(["Placa", "Veículo", "Tipo", "Proprietário", "Origem"], linhasVeiculos, "Nenhum veículo."), false),
         criarSecao("Áreas comuns", criarTabela(["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."), false),
         criarSecao("Reservas", criarTabela(["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."), false),
-        criarSecao("Eventos do calendário", criarTabela(["Data", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
+        criarSecao("Eventos do calendário", criarTabela(["Data", "Tipo", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
         criarBotaoRestaurar()
     );
 }

@@ -169,11 +169,54 @@ function carregarReservas() {
 }
 
 /**
+ * Tipo usado para as reservas de áreas comuns quando aparecem no calendário.
+ */
+const TIPO_RESERVA = { id: "reserva", nome: "Reserva" };
+
+/**
+ * Devolve o tipo de evento pelo id (ex.: "aviso" -> { id, nome: "Aviso" }),
+ * incluindo o tipo "reserva". Devolve null se não existir.
+ */
+function buscarTipoEvento(tipoId) {
+    if (tipoId === TIPO_RESERVA.id) return TIPO_RESERVA;
+    return tiposEventoMock.find(tipo => tipo.id === tipoId) || null;
+}
+
+/**
+ * Devolve o nome do tipo para exibir na tela (ex.: "Manutenção").
+ * Eventos antigos, sem tipo, aparecem como "Evento".
+ */
+function nomeTipoEvento(tipoId) {
+    const tipo = buscarTipoEvento(tipoId || "evento");
+    return tipo ? tipo.nome : "Evento";
+}
+
+/**
+ * Converte as reservas de áreas comuns em itens de calendário, para que
+ * apareçam junto com os eventos. Formato: { id, data, tipo, titulo, horario, local }.
+ */
+function carregarReservasComoEventos() {
+    return carregarReservas().map(reserva => {
+        const area = buscarArea(reserva.areaId);
+        const morador = buscarUsuario(reserva.moradorId);
+        const nomeArea = area ? area.nome : reserva.areaId;
+        return {
+            id: reserva.id,
+            data: reserva.data,
+            tipo: TIPO_RESERVA.id,
+            titulo: `Reserva - ${nomeArea}`,
+            horario: reserva.horario,
+            local: morador && morador.apartamento ? `${nomeArea} (Apto ${morador.apartamento})` : nomeArea
+        };
+    });
+}
+
+/**
  * Devolve todos os eventos do condomínio, ordenados por data e horário:
- * os de exemplo do calendário (mockEventos, declarado em Calendario.js)
+ * os de exemplo do calendário (mockEventos, declarado em DadosMock.js)
  * somados aos registrados pela síndica (salvos no localStorage).
- * Cada item tem o formato { data, titulo, horario, local }.
- * Se a página não carregou Calendario.js, usa só os registrados.
+ * Não inclui as reservas (ver carregarReservasComoEventos).
+ * Cada item tem o formato { data, tipo, titulo, horario, local }.
  */
 function carregarTodosEventos() {
     const eventos = [];
@@ -182,10 +225,11 @@ function carregarTodosEventos() {
     if (typeof mockEventos !== "undefined") {
         Object.entries(mockEventos).forEach(([data, lista]) => {
             lista.forEach(evento => {
-                // Eventos registrados pela síndica (id "evt-...") também são copiados
-                // para mockEventos no calendário; aqui vêm só do localStorage.
-                if (String(evento.id).startsWith("evt-")) return;
-                eventos.push({ data, titulo: evento.titulo, horario: evento.horario, local: evento.local });
+                // Na página do calendário, os eventos da síndica e as reservas também
+                // são copiados para mockEventos (marcados com "injetado"); aqui
+                // entram só os de exemplo, para não aparecerem repetidos.
+                if (evento.injetado) return;
+                eventos.push({ data, tipo: evento.tipo || "evento", titulo: evento.titulo, horario: evento.horario, local: evento.local });
             });
         });
     }
@@ -194,6 +238,7 @@ function carregarTodosEventos() {
     lerArmazenamento(CHAVE_EVENTOS, []).forEach(evento => {
         eventos.push({
             data: evento.data,
+            tipo: evento.tipo || "evento",
             titulo: evento.titulo,
             horario: `${evento.inicio} - ${evento.fim}`,
             local: evento.local

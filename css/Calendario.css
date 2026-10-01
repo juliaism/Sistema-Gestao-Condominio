@@ -115,16 +115,6 @@ body {
     padding-top: 15px;
 }
 
-.add-event {
-    width: 100%;
-    padding: 12px;
-}
-
-.add-event:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
 .hidden {
     display: none;
 }
@@ -154,7 +144,7 @@ body {
     margin: 2px 0;
 }
 
-.event-local {
+.event-place {
     font-size: 13px;
     color: #666;
     margin: 2px 0;

@@ -1320,3 +1320,39 @@ a.btn {
 .day.selected {
     color: #ffffff;
 }
+
+/* ---------- Etiquetas de tipo de evento (calendário) ---------- */
+
+/* Etiqueta pequena acima do título do evento, com uma cor por tipo */
+.event-tag {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+}
+
+.event-tag-aviso {
+    background: #fff4e0;
+    color: #8a5a00;
+}
+
+.event-tag-manutencao {
+    background: #eef1f5;
+    color: #4a5565;
+}
+
+.event-tag-assembleia {
+    background: #f1ecfb;
+    color: #5b3a9e;
+}
+
+.event-tag-reserva {
+    background: #e9f7ee;
+    color: #1e6b34;
+}

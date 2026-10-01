@@ -2,28 +2,8 @@
  * DadosTeste.js
  * ------------------------------------------------------------------
  * Menu lateral "Dados mockados", presente em todas as telas.
- * Fica fechado na borda direita da tela, como um botão "‹ Dados mockados".
- * Ao clicar, abre um painel com os dados salvos no sistema:
- *   - como testar;
- *   - usuários (com CPF, e-mail e senha);
- *   - pessoas permitidas (CPF) e veículos permitidos (placa);
- *   - áreas comuns, reservas e eventos do calendário.
- * Também tem um botão para restaurar os dados de exemplo
- * (apaga o que foi criado durante os testes).
- *
- * O painel é criado por este script (não precisa de HTML na página) e se
- * atualiza sozinho quando algo é salvo (evento "dados-atualizados",
- * disparado por salvarArmazenamento em Comum.js).
- *
- * Depende de DadosMock.js e Comum.js.
  */
 
-/**
- * Cria uma tabela com cabeçalho. Devolve um parágrafo quando não há linhas.
- * - cabecalhos: nomes das colunas
- * - linhas:     lista de linhas; cada linha é uma lista de textos
- * A tabela fica numa <div> com rolagem horizontal, para telas pequenas.
- */
 function criarTabela(cabecalhos, linhas, textoVazio) {
     if (linhas.length === 0) {
         const vazio = document.createElement("p");
@@ -64,9 +44,6 @@ function criarTabela(cabecalhos, linhas, textoVazio) {
     return rolagem;
 }
 
-/**
- * Cria uma seção recolhível (<details>) com título e conteúdo.
- */
 function criarSecao(titulo, conteudo, aberta) {
     const secao = document.createElement("details");
     secao.className = "dados-secao";
@@ -79,9 +56,6 @@ function criarSecao(titulo, conteudo, aberta) {
     return secao;
 }
 
-/**
- * Lista de dicas com o passo a passo para testar cada funcionalidade.
- */
 function criarDicas() {
     const reservaOcupada = reservasMock[0];
     const areaOcupada = buscarArea(reservaOcupada.areaId);
@@ -90,6 +64,8 @@ function criarDicas() {
     const dicas = [
         "Portaria: entre como Porteiro, abra a aba Pessoas e digite um CPF da tabela abaixo. Para testar um CPF não cadastrado, use 111.444.777-35.",
         "Garagem: na aba Garagem, digite uma placa da tabela de veículos. Para testar uma placa não cadastrada, use XYZ9K87.",
+        "Correspondências: entre como Síndica ou Porteiro e abra \"Correspondências\" no menu para ver o histórico. Filtre por apartamento (ex.: 302) ou por status; para ver a lista vazia, pesquise um apartamento inexistente (ex.: 999).",
+        "Registrar correspondência: como Porteiro, abra \"Gerenciamento de Correspondências: registrar chegada\", preencha apartamento e tipo de pacote e clique em Registrar. Deixando o apartamento em branco, aparece o erro de campo obrigatório.",
         "Registrar evento: entre como Síndica, clique em \"Registrar evento\", escolha o tipo (Aviso, Manutenção, Assembleia ou Evento), preencha e salve.",
         "Reservas no calendário: as reservas de áreas comuns aparecem no calendário com a etiqueta \"Reserva\".",
         "Acesso negado: entre como Morador e clique em \"Registrar evento\" no calendário.",
@@ -106,21 +82,17 @@ function criarDicas() {
     return lista;
 }
 
-/**
- * Botão que apaga tudo o que foi criado durante os testes (localStorage)
- * e recarrega a página com apenas os dados de exemplo.
- */
 function criarBotaoRestaurar() {
     const botao = document.createElement("button");
     botao.type = "button";
     botao.className = "btn btn-secundario btn-bloco";
     botao.textContent = "Restaurar dados de exemplo";
     botao.addEventListener("click", () => {
-        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos e registros criados durante os testes?");
+        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos, correspondências e registros criados durante os testes?");
         if (!confirmou) return;
 
         try {
-            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS]
+            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS, CHAVE_CORRESPONDENCIAS]
                 .forEach(chave => localStorage.removeItem(chave));
         } catch (erro) {
             console.warn("Não foi possível limpar os dados locais.", erro);
@@ -130,9 +102,6 @@ function criarBotaoRestaurar() {
     return botao;
 }
 
-/**
- * Monta o conteúdo do painel com os dados atuais.
- */
 function montarDadosMockados(corpo) {
     corpo.innerHTML = "";
 
@@ -165,6 +134,16 @@ function montarDadosMockados(corpo) {
         veiculo.origem
     ]);
 
+    const linhasCorrespondencias = carregarCorrespondencias().map(item => [
+        item.apartamento ? `Apto ${item.apartamento}` : "-",
+        item.destinatario,
+        nomeTipoCorrespondencia(item.tipo),
+        formatarDataHoraBR(item.data, item.hora),
+        nomeStatusCorrespondencia(item.status),
+        item.status === "entregue" ? (item.retiradoPor || "Não informado") : "-",
+        item.origem
+    ]);
+
     const linhasAreas = areasComunsMock.map(area => [
         area.nome,
         `${area.capacidade} pessoas`,
@@ -193,7 +172,6 @@ function montarDadosMockados(corpo) {
         evento.local
     ]);
 
-    // --- NOVO: Mapeamento dos Requerimentos ---
     const linhasRequerimentos = carregarRequerimentos().map(req => {
         const tipoObj = tiposRequerimentoMock.find(t => t.id === req.tipo);
         const morador = buscarUsuario(req.moradorId);
@@ -211,27 +189,21 @@ function montarDadosMockados(corpo) {
         criarSecao("Usuários", criarTabela(["Nome", "Perfil", "CPF", "E-mail", "Senha"], linhasUsuarios, "Nenhum usuário."), true),
         criarSecao("Pessoas permitidas", criarTabela(["Nome", "CPF", "Tipo", "Destino", "Origem"], linhasPessoas, "Nenhuma pessoa."), false),
         criarSecao("Veículos permitidos", criarTabela(["Placa", "Veículo", "Tipo", "Proprietário", "Origem"], linhasVeiculos, "Nenhum veículo."), false),
+        criarSecao("Correspondências", criarTabela(["Apartamento", "Destinatário", "Tipo", "Recebido em", "Status", "Retirado por", "Origem"], linhasCorrespondencias, "Nenhuma correspondência."), false),
         criarSecao("Áreas comuns", criarTabela(["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."), false),
         criarSecao("Reservas", criarTabela(["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."), false),
         criarSecao("Eventos do calendário", criarTabela(["Data", "Tipo", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
-        
-        // --- NOVO: Adicionado no painel ---
-        criarSecao("Requerimentos", criarTabela(["Tipo", "Descrição", "Morador", "Data", "Estado"], linhasRequerimentos, "Nenhum requerimento."), false),
-        
+        criarSecao("Requerimentos", criarTabela(["Tipo", "Descrição", "Morador", "Data", "Estado"], linhasRequerimentos, "Nenum requerimento."), false),
         criarBotaoRestaurar()
     );
 }
 
-/**
- * Cria o menu lateral, fechado, e liga o botão que abre e fecha.
- */
 function criarMenuDados() {
     const menu = document.createElement("aside");
     menu.className = "dados-lateral";
     menu.id = "dados-lateral";
     menu.setAttribute("aria-label", "Dados mockados");
 
-    // Botão que fica na borda da tela: "‹ Dados mockados" (fechado) / "› Fechar" (aberto)
     const alca = document.createElement("button");
     alca.type = "button";
     alca.className = "dados-alca";
@@ -277,7 +249,6 @@ function criarMenuDados() {
     document.addEventListener("keydown", (evento) => {
         if (evento.key === "Escape" && aberto()) alternar(false);
     });
-    // Atualiza as tabelas quando algo é salvo com o menu aberto.
     window.addEventListener("dados-atualizados", () => {
         if (aberto()) montarDadosMockados(corpo);
     });

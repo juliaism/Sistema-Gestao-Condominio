@@ -19,6 +19,7 @@ const CHAVE_RESERVAS = "condominio:reservas";  // reservas criadas pelos morador
 const CHAVE_PESSOAS = "condominio:pessoas";    // pessoas permitidas cadastradas pelo porteiro (localStorage)
 const CHAVE_VEICULOS = "condominio:veiculos";  // veículos permitidos cadastrados pelo porteiro (localStorage)
 const CHAVE_ACESSOS = "condominio:acessos";    // registro de entradas/consultas da portaria (localStorage)
+const CHAVE_CORRESPONDENCIAS = "condominio:correspondencias"; // correspondências registradas na portaria (localStorage)
 
 // Páginas que aparecem no menu do cabeçalho.
 // "id" é usado para destacar a página em que o usuário está.
@@ -29,7 +30,8 @@ const PAGINAS = [
     { id: "inicio", titulo: "Início", arquivo: "index.html" },
     { id: "calendario", titulo: "Calendário", arquivo: "pages/calendario-condominial.html" },
     { id: "reservas", titulo: "Reservas", arquivo: "pages/reservas.html", perfis: ["admin", "morador"] },
-    { id: "portaria", titulo: "Portaria", arquivo: "pages/portaria.html", perfis: ["porteiro"] }
+    { id: "portaria", titulo: "Portaria", arquivo: "pages/portaria.html", perfis: ["porteiro"] },
+    { id: "correspondencias", titulo: "Correspondências", arquivo: "pages/correspondencias.html", perfis: ["admin", "porteiro"] }
 ];
 
 // Tela de login, a partir da raiz do projeto.
@@ -127,6 +129,14 @@ function ehAdministrador(usuario) {
  */
 function ehPorteiro(usuario) {
     return Boolean(usuario) && usuario.perfil === "porteiro";
+}
+
+/**
+ * Indica quem pode consultar o registro de correspondências:
+ * a síndica (gestão) e o porteiro (quem recebe e entrega os itens).
+ */
+function podeVerCorrespondencias(usuario) {
+    return ehAdministrador(usuario) || ehPorteiro(usuario);
 }
 
 /**
@@ -364,6 +374,48 @@ function carregarVeiculos() {
     return exemplos.concat(criados);
 }
 
+// ---------- Correspondências ----------
+
+// Tipos de correspondência recebidos na portaria.
+const TIPOS_CORRESPONDENCIA = {
+    encomenda: "Encomenda",
+    carta: "Carta",
+    registrada: "Carta registrada"
+};
+
+// Situação de cada correspondência: ainda na portaria ou já retirada.
+const STATUS_CORRESPONDENCIA = {
+    pendente: "Pendente",
+    entregue: "Entregue"
+};
+
+/**
+ * Devolve todo o histórico de correspondências, da mais recente para a mais
+ * antiga: as mockadas (correspondenciasMock) somadas às registradas na
+ * portaria durante o uso (localStorage). Cada item recebe o campo "origem".
+ */
+function carregarCorrespondencias() {
+    const exemplos = correspondenciasMock.map(item => ({ ...item, origem: "Exemplo" }));
+    const registradas = lerArmazenamento(CHAVE_CORRESPONDENCIAS, []).map(item => ({ ...item, origem: "Registrada" }));
+    return exemplos
+        .concat(registradas)
+        .sort((a, b) => (b.data + b.hora).localeCompare(a.data + a.hora));
+}
+
+/**
+ * Nome do tipo para exibir na tela (ex.: "encomenda" -> "Encomenda").
+ */
+function nomeTipoCorrespondencia(tipo) {
+    return TIPOS_CORRESPONDENCIA[tipo] || tipo || "-";
+}
+
+/**
+ * Nome do status para exibir na tela (ex.: "pendente" -> "Pendente").
+ */
+function nomeStatusCorrespondencia(status) {
+    return STATUS_CORRESPONDENCIA[status] || status || "-";
+}
+
 // ---------- Cabeçalho ----------
 
 /**
@@ -463,6 +515,24 @@ function dataDeHoje() {
 function formatarDataBR(dataString) {
     const [ano, mes, dia] = dataString.split("-");
     return `${dia}/${mes}/${ano}`;
+}
+
+/**
+ * Junta data e hora no formato brasileiro (ex.: "28/09/2026 15:30").
+ * Sem data, devolve "-"; sem hora, devolve apenas a data.
+ */
+function formatarDataHoraBR(dataString, hora) {
+    if (!dataString) return "-";
+    return hora ? `${formatarDataBR(dataString)} ${hora}` : formatarDataBR(dataString);
+}
+
+/**
+ * Devolve a hora atual no formato HH:MM (ex.: "15:30"), o mesmo usado
+ * pelos campos <input type="time"> e pelos dados.
+ */
+function horaDeAgora() {
+    const agora = new Date();
+    return `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
 }
 
 /**

@@ -26,7 +26,8 @@ const perfisMock = [
         permissoes: [
             "Registrar eventos no calendário condominial",
             "Ver todas as reservas de áreas comuns",
-            "Reservar áreas comuns"
+            "Reservar áreas comuns",
+            "Consultar o registro de correspondências do condomínio"
         ]
     },
     {
@@ -47,6 +48,8 @@ const perfisMock = [
             "Controlar a entrada de pessoas pelo CPF",
             "Controlar o acesso à garagem pela placa do veículo",
             "Cadastrar novas pessoas e veículos permitidos",
+            "Registrar a chegada de encomendas e cartas no inventário",
+            "Consultar o registro de correspondências do condomínio",
             "Consultar o calendário e as reservas do condomínio"
         ]
     }
@@ -94,6 +97,52 @@ const veiculosMock = [
     { id: "v3", placa: "JKL9876", modelo: "Fiat Uno", cor: "Branco", tipo: "visitante", proprietario: "Mariana Costa", detalhe: "Visita ao Apto 302" },
     { id: "v4", placa: "QWE2R34", modelo: "Chevrolet Onix", cor: "Vermelho", tipo: "funcionario", proprietario: "Marcos Teixeira", detalhe: "Manutenção" },
     { id: "v5", placa: "MNO5P67", modelo: "Hyundai HB20", cor: "Azul", tipo: "funcionario", proprietario: "Fernanda Lima", detalhe: "Administração" }
+];
+
+/*
+ * Correspondências recebidas na portaria (encomendas e cartas).
+ * Formam o histórico consultado na tela "Correspondências"; o que o
+ * porteiro registrar durante o uso é salvo à parte no localStorage.
+ * - tipo:         "encomenda" | "carta" | "registrada" (ver TIPOS_CORRESPONDENCIA)
+ * - apartamento:  apartamento de destino
+ * - destinatario: nome de quem vai receber
+ * - remetente:    quem enviou (loja, pessoa, órgão...)
+ * - data / hora:  quando a portaria recebeu o item (AAAA-MM-DD e HH:MM)
+ * - recebidoPor:  porteiro que recebeu (ver usuariosMock)
+ * - status:       "pendente" (ainda na portaria) | "entregue" (retirada)
+ * - dataEntrega / horaEntrega / retiradoPor: preenchidos só quando entregue
+ */
+const correspondenciasMock = [
+    {
+        id: "c1", tipo: "encomenda", apartamento: "302", destinatario: "Carlos Mendes",
+        remetente: "Mercado Livre", data: "2026-09-25", hora: "10:15", recebidoPor: "u4",
+        status: "entregue", dataEntrega: "2026-09-25", horaEntrega: "19:40", retiradoPor: "Carlos Mendes"
+    },
+    {
+        id: "c2", tipo: "carta", apartamento: "1401", destinatario: "João Pereira",
+        remetente: "Banco do Brasil", data: "2026-09-26", hora: "09:00", recebidoPor: "u4",
+        status: "entregue", dataEntrega: "2026-09-27", horaEntrega: "08:20", retiradoPor: "João Pereira"
+    },
+    {
+        id: "c3", tipo: "registrada", apartamento: "302", destinatario: "Helena Mendes",
+        remetente: "Receita Federal", data: "2026-09-28", hora: "15:30", recebidoPor: "u4",
+        status: "pendente", dataEntrega: null, horaEntrega: null, retiradoPor: null
+    },
+    {
+        id: "c4", tipo: "encomenda", apartamento: "1401", destinatario: "João Pereira",
+        remetente: "Amazon", data: "2026-09-30", hora: "11:45", recebidoPor: "u4",
+        status: "pendente", dataEntrega: null, horaEntrega: null, retiradoPor: null
+    },
+    {
+        id: "c5", tipo: "encomenda", apartamento: "302", destinatario: "Carlos Mendes",
+        remetente: "Magazine Luiza", data: "2026-10-01", hora: "08:50", recebidoPor: "u4",
+        status: "pendente", dataEntrega: null, horaEntrega: null, retiradoPor: null
+    },
+    {
+        id: "c6", tipo: "carta", apartamento: "302", destinatario: "Carlos Mendes",
+        remetente: "Condomínio (boleto)", data: "2026-10-01", hora: "09:10", recebidoPor: "u4",
+        status: "entregue", dataEntrega: "2026-10-01", horaEntrega: "12:05", retiradoPor: "Helena Mendes"
+    }
 ];
 
 /*

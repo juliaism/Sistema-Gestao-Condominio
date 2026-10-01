@@ -171,7 +171,7 @@ function renderizarProximosEventos() {
     }
 
     eventos.slice(0, LIMITE_ITENS).forEach(evento => {
-        const detalhe = `${evento.horario} | ${evento.local}`;
+        const detalhe = `${nomeTipoEvento(evento.tipo)} | ${evento.horario} | ${evento.local}`;
         listaProximosEventos.appendChild(criarItemLista(evento.data, evento.titulo, detalhe));
     });
 }

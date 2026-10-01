@@ -13,8 +13,8 @@ Aplicação web para apoiar a administração de um condomínio e a comunicaçã
 | **Autenticação** | Login por escolha de perfil e usuário (ou e-mail e senha), com controle de sessão por perfil. | Todos |
 | **Página inicial** | Saudação, atalhos, próximos eventos, reservas e permissões do perfil logado. | Todos |
 | **Dados mockados** | Menu lateral recolhido na direita (`‹ Dados mockados`) com os dados salvos e botão para restaurar os dados de exemplo. | Todos |
-| **Calendário condominial** | Navegação entre meses, destaque dos dias com eventos e listagem dos eventos do dia selecionado. | Todos |
-| **Registro de eventos** | Cadastro de eventos (título, data, horário e local) que passam a aparecer no calendário para todos os moradores. | Síndica (administrador) |
+| **Calendário condominial** | Navegação entre meses, destaque dos dias com eventos e reservas, e listagem do dia selecionado com etiqueta do tipo (Aviso, Manutenção, Assembleia, Evento ou Reserva). | Todos |
+| **Registro de eventos e avisos** | Cadastro de avisos, manutenções, assembleias e eventos (título, tipo, data, horário e local), visíveis no calendário para todos. | Somente síndica |
 | **Reserva de áreas comuns** | Consulta de horários disponíveis por área e data, confirmação de reserva e bloqueio de conflitos de horário. | Moradores e síndica |
 | **Portaria: controle de pessoas** | O porteiro informa o CPF; se estiver cadastrado, aparece "Apto a entrar" com as informações da pessoa (morador, visitante ou funcionário). Permite adicionar nova pessoa permitida. | Porteiro |
 | **Portaria: garagem** | Mesma ideia, pela placa do veículo (padrão antigo ou Mercosul). Só entram veículos de moradores, visitantes e funcionários cadastrados. Permite adicionar novo veículo permitido. | Porteiro |
@@ -39,8 +39,7 @@ Trabalho-eng-software/
 │
 ├── pages/                            # Telas do sistema
 │   ├── login.html                    # Tela de login com escolha de perfil e dados de teste
-│   ├── calendario.html               # Calendário (versão inicial do módulo)
-│   ├── calendario-condominial.html   # Calendário + registro de eventos pela síndica
+│   ├── calendario-condominial.html   # Calendário condominial + registro de eventos pela síndica
 │   ├── reservas.html                 # Reserva de áreas comuns
 │   └── portaria.html                 # Controle de pessoas (CPF) e garagem (placa) pelo porteiro
 │

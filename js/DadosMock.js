@@ -146,15 +146,35 @@ const reservasMock = [
 ];
 
 /*
+ * Tipos de evento do calendário condominial.
+ * Avisos, manutenções, assembleias e eventos são registrados SOMENTE
+ * pela síndica (perfil "admin"). O tipo "reserva" não aparece no
+ * formulário: ele identifica as reservas de áreas comuns feitas pelos
+ * moradores na tela de Reservas, que também aparecem no calendário.
+ */
+const tiposEventoMock = [
+    { id: "aviso", nome: "Aviso" },
+    { id: "manutencao", nome: "Manutenção" },
+    { id: "assembleia", nome: "Assembleia" },
+    { id: "evento", nome: "Evento" }
+];
+
+/*
  * Eventos de exemplo do calendário condominial, agrupados por data
  * (AAAA-MM-DD). Os eventos registrados pela síndica são salvos à parte.
+ * - tipo: um dos ids de tiposEventoMock
+ * As reservas (ex.: Salão de Festas em 15/10) vêm de reservasMock e são
+ * colocadas no calendário automaticamente, por isso não ficam aqui.
  */
 const mockEventos = {
-    "2026-10-14": [
-        { id: "1", titulo: "Aula de natação particular", horario: "08:00 - 10:00", local: "Piscina" },
-        { id: "2", titulo: "Reparo Ar-Condicionado", horario: "10:15 - 12:15", local: "Academia" }
+    "2026-10-08": [
+        { id: "4", tipo: "aviso", titulo: "Corte de água para limpeza da caixa d'água", horario: "09:00 - 13:00", local: "Todo o condomínio" }
     ],
-    "2026-10-15": [
-        { id: "3", titulo: "Festa Joao (apt 1401)", horario: "14:00 - 18:00", local: "Salão de Festas" }
+    "2026-10-14": [
+        { id: "1", tipo: "evento", titulo: "Aula de natação particular", horario: "08:00 - 10:00", local: "Piscina" },
+        { id: "2", tipo: "manutencao", titulo: "Reparo Ar-Condicionado", horario: "10:15 - 12:15", local: "Academia" }
+    ],
+    "2026-10-20": [
+        { id: "5", tipo: "assembleia", titulo: "Assembleia ordinária", horario: "19:00 - 21:00", local: "Hall de entrada" }
     ]
 };

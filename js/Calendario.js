@@ -1,5 +1,15 @@
-// Os eventos de exemplo (mockEventos) ficam em DadosMock.js,
-// que deve ser carregado antes deste arquivo.
+/*
+ * Calendario.js
+ * ------------------------------------------------------------------
+ * Calendário condominial (usado em pages/calendario-condominial.html):
+ * desenha os dias do mês, marca os dias com eventos e mostra a lista
+ * de eventos do dia clicado.
+ *
+ * Os eventos de exemplo (mockEventos) ficam em DadosMock.js, que deve
+ * ser carregado antes deste arquivo. O cadastro de novos eventos é feito
+ * pela síndica em RegistroEvento.js, que verifica a permissão do usuário
+ * e também coloca no calendário as reservas de áreas comuns.
+ */
 
 
 let currentDate = new Date(2026, 9, 1); 
@@ -13,7 +23,6 @@ const nextMonthBtn = document.getElementById("next-month");
 const listContainer = document.getElementById("list-container");
 const calendarDescription = document.getElementById("calendar-description");
 const eventsList = document.getElementById("events-list");
-const addEventBtn = document.getElementById("add-event");
 
 const meses = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -69,10 +78,6 @@ function renderCalendar() {
 
             const isPastDate = loopDate < today;
 
-            if (addEventBtn) {
-                addEventBtn.disabled = isPastDate;
-            }
-
             renderEventos(dateString, isPastDate);
         });
 
@@ -100,7 +105,15 @@ function renderEventos(dateString, isPastDate = false) {
                 }
 
                 card.classList.add("card");
+
+                // Etiqueta do tipo (Aviso, Manutenção, Reserva...), quando o evento tiver tipo.
+                // nomeTipoEvento vem de Comum.js.
+                const etiqueta = item.tipo && typeof nomeTipoEvento === "function"
+                    ? `<span class="event-tag event-tag-${item.tipo}">${nomeTipoEvento(item.tipo)}</span>`
+                    : "";
+
                 card.innerHTML = `
+                 ${etiqueta}
                  <p class="event-title">${item.titulo}</p> 
                  <p class="event-time">Horário: ${item.horario}</p> 
                  <p class="event-place">Local: ${item.local}</p> 
@@ -128,36 +141,6 @@ if (nextMonthBtn) {
         console.log("Mês trocado:", currentDate);
         renderCalendar();
 });
-}
-
-if (addEventBtn) {
-  addEventBtn.disabled = true; 
-
-  addEventBtn.addEventListener('click', () => {
-    if (!selectedDate) return;
-
-    const titulo = prompt('Digite o título do evento:');
-    const horario = prompt('Digite o horário (ex: 14:00 - 15:00):');
-    const local = prompt('Digite o local:');
-
-    if (titulo && horario && local) {
-      if (!mockEventos[selectedDate]) {
-        mockEventos[selectedDate] = [];
-      }
-
-      const novoEvento = {
-        id: Date.now(), 
-        titulo: titulo,
-        horario: horario,
-        local: local
-      };
-
-      mockEventos[selectedDate].push(novoEvento);
-
-      renderCalendar();
-      renderEventos(selectedDate, false); 
-    }
-  });
 }
 
 renderCalendar();

@@ -146,6 +146,9 @@ function renderizarAcoesRapidas() {
     } else {
         acoes.push({ texto: "Reservar área comum", destino: caminho("pages/reservas.html"), principal: !ehAdministrador(usuarioLogado) });
     }
+    if (podeVerCorrespondencias(usuarioLogado)) {
+        acoes.push({ texto: "Correspondências", destino: caminho("pages/correspondencias.html"), principal: false });
+    }
     acoes.push({ texto: "Ver calendário", destino: caminho("pages/calendario-condominial.html"), principal: false });
 
     acoesRapidas.innerHTML = "";

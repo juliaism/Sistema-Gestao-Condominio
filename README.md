@@ -18,6 +18,8 @@ Aplicação web para apoiar a administração de um condomínio e a comunicaçã
 | **Reserva de áreas comuns** | Consulta de horários disponíveis por área e data, confirmação de reserva e bloqueio de conflitos de horário. | Moradores e síndica |
 | **Portaria: controle de pessoas** | O porteiro informa o CPF; se estiver cadastrado, aparece "Apto a entrar" com as informações da pessoa (morador, visitante ou funcionário). Permite adicionar nova pessoa permitida. | Porteiro |
 | **Portaria: garagem** | Mesma ideia, pela placa do veículo (padrão antigo ou Mercosul). Só entram veículos de moradores, visitantes e funcionários cadastrados. Permite adicionar novo veículo permitido. | Porteiro |
+| **Registro de correspondências** | Histórico geral das encomendas e cartas recebidas na portaria, com apartamento, destinatário, tipo, remetente, data/hora de recebimento, status (pendente/entregue) e quem retirou. Filtros por apartamento/destinatário, status e tipo. | Síndica e porteiro |
+| **Gerenciamento de correspondências** | Registro da chegada de uma encomenda ou carta para um apartamento (apartamento, tipo de pacote e data obrigatórios). O item entra no inventário como *pendente*. | Porteiro |
 
 ---
 
@@ -41,7 +43,8 @@ Trabalho-eng-software/
 │   ├── login.html                    # Tela de login com escolha de perfil e dados de teste
 │   ├── calendario-condominial.html   # Calendário condominial + registro de eventos pela síndica
 │   ├── reservas.html                 # Reserva de áreas comuns
-│   └── portaria.html                 # Controle de pessoas (CPF) e garagem (placa) pelo porteiro
+│   ├── portaria.html                 # Controle de pessoas (CPF) e garagem (placa) pelo porteiro
+│   └── correspondencias.html         # Registro de correspondências (síndica e porteiro)
 │
 ├── css/                              # Folhas de estilo
 │   ├── Calendario.css                # Estilos do calendário
@@ -49,13 +52,14 @@ Trabalho-eng-software/
 │
 └── js/                               # Scripts
     ├── Calendario.js                 # Lógica do calendário
-    ├── DadosMock.js                  # Perfis, usuários (com CPF), pessoas e veículos permitidos, áreas, reservas e eventos de exemplo
+    ├── DadosMock.js                  # Perfis, usuários (com CPF), pessoas e veículos permitidos, correspondências, áreas, reservas e eventos de exemplo
     ├── Comum.js                      # Sessão, armazenamento, cabeçalho e utilitários
     ├── Login.js                      # Escolha de perfil/usuário e autenticação
     ├── Inicio.js                     # Página inicial: eventos, reservas e perfil
     ├── DadosTeste.js                 # Menu lateral "Dados mockados" (presente em todas as telas)
     ├── Portaria.js                   # Consulta por CPF/placa, cadastro de pessoas e veículos, registros
     ├── RegistroEvento.js             # Cadastro de eventos e controle de acesso
+    ├── Correspondencias.js           # Histórico de correspondências, filtros e lista vazia
     └── Reservas.js                   # Horários disponíveis, reservas e conflitos
 ```
 
@@ -87,6 +91,30 @@ Login de teste: `porteiro@condominio.com` / `123456`.
 - **Adicionar:** em cada aba há um bloco *Adicionar pessoa/veículo permitido*. O CPF e a placa são validados e não podem se repetir.
 - Cada consulta fica em **Últimos registros** (Liberado / Negado).
 - Apenas o perfil *Porteiro* acessa a portaria; os demais recebem "Acesso negado".
+
+---
+
+## Correspondências (síndica e porteiro)
+
+Link **Correspondências** no menu do cabeçalho.
+
+### Gerenciamento: registrar a chegada (somente porteiro)
+
+Bloco *Gerenciamento de Correspondências: registrar chegada*, no topo da página.
+
+- **Obrigatórios:** número do apartamento, tipo de pacote (encomenda, carta ou carta registrada) e data do recebimento (já vem com a data de hoje).
+- **Opcionais:** hora (vem com a hora atual), destinatário (em branco, o sistema usa o morador cadastrado no apartamento) e remetente.
+- Ao clicar em **Registrar**, o item entra no inventário como **Pendente** e aparece no histórico; a mensagem *"Correspondência registrada com sucesso"* confirma a operação.
+- **Campo obrigatório vazio:** deixando o apartamento em branco, nada é registrado e aparece *"Erro: O número do apartamento é obrigatório"* (há mensagens equivalentes para o tipo de pacote e a data).
+- A síndica não vê este bloco: quem recebe as correspondências é o porteiro.
+
+### Registro: histórico
+
+- Mostra o histórico de todas as encomendas e cartas: apartamento, destinatário, tipo, remetente, data e hora de recebimento, status (**Pendente** / **Entregue**) e, nos itens entregues, quem retirou e quando.
+- Acima da tabela, os totais de registros, pendentes e entregues acompanham os filtros.
+- **Filtros:** busca por apartamento ou destinatário (ex.: `302` ou `Carlos`), status e tipo. O botão *Limpar filtros* volta ao histórico completo.
+- **Lista vazia:** pesquisando um apartamento inexistente (ex.: `999`) — ou se o sistema não tiver nenhuma correspondência — a tabela desaparece e aparece a mensagem *"Nenhum registro de correspondência encontrado"*.
+- Moradores que abrirem a página recebem "Acesso negado".
 
 ---
 

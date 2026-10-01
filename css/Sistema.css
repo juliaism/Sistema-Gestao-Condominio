@@ -18,8 +18,9 @@
  *   9. Login
  *  10. Página inicial
  *  11. Portaria
- *  12. Menu lateral "Dados mockados"
- *  13. Telas pequenas
+ *  12. Registro de correspondências
+ *  13. Menu lateral "Dados mockados"
+ *  14. Telas pequenas
  */
 
 /* ---------- 1. Fonte e variáveis ---------- */
@@ -1149,7 +1150,104 @@ a.btn {
     color: var(--error-text);
 }
 
-/* ---------- 12. Menu lateral "Dados mockados" ---------- */
+/* ---------- 12. Registro de correspondências ---------- */
+
+/* O histórico é uma tabela larga: esta coluna é mais espaçosa que a da portaria */
+.coluna-larga {
+    max-width: 1000px;
+}
+
+/* Três contadores lado a lado: registros, pendentes e entregues */
+.resumo-correspondencias {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.resumo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 16px 18px;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.resumo-pendente {
+    border-left-color: var(--error-border);
+}
+
+.resumo-entregue {
+    border-left-color: var(--success-border);
+}
+
+.resumo-valor {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.resumo-rotulo {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-color);
+}
+
+/* Filtros em linha; o botão "Limpar" acompanha a base dos campos */
+.filtros {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    align-items: end;
+    gap: 12px;
+}
+
+/* Tabela do histórico: linhas mais altas e texto que pode quebrar */
+.tabela-correspondencias {
+    font-size: 13px;
+}
+
+.tabela-correspondencias th,
+.tabela-correspondencias td {
+    padding: 10px 12px;
+    white-space: normal;
+    vertical-align: top;
+}
+
+.tabela-legenda {
+    caption-side: bottom;
+    text-align: left;
+    padding-top: 10px;
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+.celula-principal {
+    font-weight: 600;
+}
+
+.celula-secundaria {
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+/* Célula com duas linhas: quem retirou e quando */
+.celula-dupla .celula-principal,
+.celula-dupla .celula-secundaria {
+    display: block;
+}
+
+.tag-pendente {
+    background: #fff4e0;
+    color: #8a5a00;
+}
+
+/* ---------- 13. Menu lateral "Dados mockados" ---------- */
 
 /* Painel fixo na direita; começa escondido fora da tela.
    O botão (.dados-alca) fica preso à borda esquerda do painel,
@@ -1269,7 +1367,17 @@ a.btn {
     background: #ffffff;
 }
 
-/* ---------- 13. Telas pequenas ---------- */
+/* ---------- 14. Telas pequenas ---------- */
+
+@media (max-width: 860px) {
+    .filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filtros .btn {
+        grid-column: 1 / -1;
+    }
+}
 
 @media (max-width: 640px) {
     .topo {
@@ -1292,6 +1400,14 @@ a.btn {
     }
 
     .perfis {
+        grid-template-columns: 1fr;
+    }
+
+    .resumo-correspondencias {
+        grid-template-columns: 1fr;
+    }
+
+    .filtros {
         grid-template-columns: 1fr;
     }
 

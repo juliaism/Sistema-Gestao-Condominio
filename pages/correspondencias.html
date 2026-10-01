@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!--
+    correspondencias.html
+    Correspondências do condomínio. Duas partes:
+      - Gerenciamento (só porteiro): registra a chegada de uma encomenda ou
+        carta para um apartamento, alimentando o inventário;
+      - Registro (síndica e porteiro): histórico de todas as encomendas e
+        cartas recebidas, com apartamento, status (pendente/entregue),
+        data de recebimento e quem retirou o item.
+    Há filtros por apartamento, status e tipo; quando nada é encontrado,
+    a tela exibe "Nenhum registro de correspondência encontrado".
+
+    A lógica está em Correspondencias.js; o acesso é restrito aos perfis
+    "admin" (síndica) e "porteiro".
+
+    data-raiz="../" no <body>: esta página está um nível abaixo da raiz
+    (usado por caminho() em Comum.js para montar os links).
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correspondências | Gestão Condominial</title>
+    <link rel="stylesheet" href="../css/Sistema.css" />
+</head>
+<body data-raiz="../">
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="coluna coluna-larga">
+            <!-- Aparece no lugar do conteúdo quando o perfil não tem acesso -->
+            <div id="mensagem-acesso" class="mensagem hidden" role="alert"></div>
+
+            <div id="conteudo-correspondencias">
+                <h1 class="pagina-titulo">Registro de Correspondências</h1>
+                <p class="pagina-subtitulo">
+                    Histórico de todas as encomendas e cartas recebidas na portaria: pendentes e já entregues aos moradores.
+                </p>
+
+                <!-- Totais do histórico (recalculados conforme os filtros) -->
+                <section class="resumo-correspondencias" aria-label="Resumo do registro">
+                    <div class="resumo-item">
+                        <span class="resumo-valor" id="total-itens">0</span>
+                        <span class="resumo-rotulo">Registros</span>
+                    </div>
+                    <div class="resumo-item resumo-pendente">
+                        <span class="resumo-valor" id="total-pendentes">0</span>
+                        <span class="resumo-rotulo">Pendentes</span>
+                    </div>
+                    <div class="resumo-item resumo-entregue">
+                        <span class="resumo-valor" id="total-entregues">0</span>
+                        <span class="resumo-rotulo">Entregues</span>
+                    </div>
+                </section>
+
+                <!-- Gerenciamento do inventário: só o porteiro registra a chegada de itens -->
+                <details class="painel recolhivel" id="bloco-registro">
+                    <summary>Gerenciamento de Correspondências: registrar chegada</summary>
+                    <div id="mensagem-registro" class="mensagem hidden" role="alert"></div>
+                    <form id="form-registro" class="formulario" novalidate>
+                        <div class="campo-linha">
+                            <label class="campo">
+                                Número do apartamento
+                                <input type="text" id="registro-apartamento" maxlength="6" placeholder="Ex.: 302" autocomplete="off">
+                            </label>
+                            <label class="campo">
+                                Tipo de pacote
+                                <select id="registro-tipo">
+                                    <option value="">Selecione...</option>
+                                    <option value="encomenda">Encomenda</option>
+                                    <option value="carta">Carta</option>
+                                    <option value="registrada">Carta registrada</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="campo-linha">
+                            <label class="campo">
+                                Data do recebimento
+                                <input type="date" id="registro-data">
+                            </label>
+                            <label class="campo">
+                                <span>Hora <span class="campo-ajuda">(opcional)</span></span>
+                                <input type="time" id="registro-hora">
+                            </label>
+                        </div>
+                        <label class="campo">
+                            <span>Destinatário <span class="campo-ajuda">(opcional)</span></span>
+                            <input type="text" id="registro-destinatario" maxlength="80" placeholder="Em branco: o morador do apartamento">
+                        </label>
+                        <label class="campo">
+                            <span>Remetente <span class="campo-ajuda">(opcional)</span></span>
+                            <input type="text" id="registro-remetente" maxlength="60" placeholder="Ex.: Correios ou Mercado Livre">
+                        </label>
+                        <button type="submit" class="btn btn-primario">Registrar</button>
+                    </form>
+                </details>
+
+                <div class="painel">
+                    <h2 class="painel-titulo">Filtrar o histórico</h2>
+                    <p class="painel-texto">Pesquise por apartamento ou destinatário e escolha a situação dos itens.</p>
+
+                    <form id="form-filtros" class="filtros" novalidate>
+                        <label class="campo">
+                            Apartamento ou destinatário
+                            <input type="text" id="filtro-busca" maxlength="60" placeholder="Ex.: 302 ou Carlos" autocomplete="off">
+                        </label>
+                        <label class="campo">
+                            Status
+                            <select id="filtro-status">
+                                <option value="todos">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="entregue">Entregue</option>
+                            </select>
+                        </label>
+                        <label class="campo">
+                            Tipo
+                            <select id="filtro-tipo">
+                                <option value="todos">Todos</option>
+                                <option value="encomenda">Encomenda</option>
+                                <option value="carta">Carta</option>
+                                <option value="registrada">Carta registrada</option>
+                            </select>
+                        </label>
+                        <button type="button" id="btn-limpar" class="btn btn-secundario">Limpar filtros</button>
+                    </form>
+                </div>
+
+                <div class="painel">
+                    <h2 class="painel-titulo">Histórico completo</h2>
+
+                    <!-- Mensagem exibida quando o filtro (ou o sistema) não tem registros -->
+                    <p id="lista-vazia" class="lista-vazia hidden" role="status"></p>
+
+                    <div id="tabela-rolagem" class="tabela-rolagem">
+                        <table class="tabela tabela-correspondencias">
+                            <caption class="tabela-legenda">
+                                Correspondências recebidas na portaria, da mais recente para a mais antiga.
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Apartamento</th>
+                                    <th scope="col">Destinatário</th>
+                                    <th scope="col">Tipo</th>
+                                    <th scope="col">Remetente</th>
+                                    <th scope="col">Recebido em</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Retirado por</th>
+                                </tr>
+                            </thead>
+                            <!-- Linhas geradas por Correspondencias.js -->
+                            <tbody id="corpo-tabela"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ordem importa: dados mockados -> funções comuns -> lógica da tela -->
+    <script src="../js/DadosMock.js"></script>
+    <script src="../js/Comum.js"></script>
+    <script src="../js/Correspondencias.js"></script>
+    <script src="../js/DadosTeste.js"></script>
+</body>
+</html>

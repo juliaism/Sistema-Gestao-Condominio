@@ -178,3 +178,25 @@ const mockEventos = {
         { id: "5", tipo: "assembleia", titulo: "Assembleia ordinária", horario: "19:00 - 21:00", local: "Hall de entrada" }
     ]
 };
+
+/* ==========================================================================
+   Módulos de Requerimentos (Cartões 1 e 2)
+   ========================================================================== */
+const tiposRequerimentoMock = [
+    { id: "manutencao", nome: "Manutenção / Reparação" },
+    { id: "reclamacao", nome: "Reclamação" },
+    { id: "duvida", nome: "Dúvida / Esclarecimento" },
+    { id: "sugestao", nome: "Sugestão" },
+    { id: "outros", nome: "Outros" }
+];
+
+const requerimentosMock = [
+    {
+        id: "req-101",
+        tipo: "manutencao",
+        descricao: "Lâmpada do corredor do 3º andar fundida.",
+        moradorId: "u2",
+        data: "2026-10-01",
+        status: "Pendente"
+    }
+];

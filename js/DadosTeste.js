@@ -116,11 +116,11 @@ function criarBotaoRestaurar() {
     botao.className = "btn btn-secundario btn-bloco";
     botao.textContent = "Restaurar dados de exemplo";
     botao.addEventListener("click", () => {
-        const confirmou = window.confirm("Apagar os eventos, reservas, pessoas, veículos e registros criados durante os testes?");
+        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos e registros criados durante os testes?");
         if (!confirmou) return;
 
         try {
-            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS]
+            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS]
                 .forEach(chave => localStorage.removeItem(chave));
         } catch (erro) {
             console.warn("Não foi possível limpar os dados locais.", erro);
@@ -193,6 +193,19 @@ function montarDadosMockados(corpo) {
         evento.local
     ]);
 
+    // --- NOVO: Mapeamento dos Requerimentos ---
+    const linhasRequerimentos = carregarRequerimentos().map(req => {
+        const tipoObj = tiposRequerimentoMock.find(t => t.id === req.tipo);
+        const morador = buscarUsuario(req.moradorId);
+        return [
+            tipoObj ? tipoObj.nome : req.tipo,
+            req.descricao,
+            morador ? morador.nome : req.moradorId,
+            formatarDataBR(req.data),
+            req.status
+        ];
+    });
+
     corpo.append(
         criarSecao("Como testar", criarDicas(), true),
         criarSecao("Usuários", criarTabela(["Nome", "Perfil", "CPF", "E-mail", "Senha"], linhasUsuarios, "Nenhum usuário."), true),
@@ -201,6 +214,10 @@ function montarDadosMockados(corpo) {
         criarSecao("Áreas comuns", criarTabela(["Área", "Capacidade", "Horários"], linhasAreas, "Nenhuma área."), false),
         criarSecao("Reservas", criarTabela(["Área", "Data", "Horário", "Morador", "Origem"], linhasReservas, "Nenhuma reserva."), false),
         criarSecao("Eventos do calendário", criarTabela(["Data", "Tipo", "Título", "Horário", "Local"], linhasEventos, "Nenhum evento."), false),
+        
+        // --- NOVO: Adicionado no painel ---
+        criarSecao("Requerimentos", criarTabela(["Tipo", "Descrição", "Morador", "Data", "Estado"], linhasRequerimentos, "Nenhum requerimento."), false),
+        
         criarBotaoRestaurar()
     );
 }

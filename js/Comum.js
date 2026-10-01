@@ -12,6 +12,7 @@
  */
 
 // Chaves usadas para guardar informações no navegador.
+const CHAVE_REQUERIMENTOS = "condominio:requerimentos";
 const CHAVE_SESSAO = "condominio:usuario";     // id do usuário logado (sessionStorage)
 const CHAVE_EVENTOS = "condominio:eventos";    // eventos criados pela síndica (localStorage)
 const CHAVE_RESERVAS = "condominio:reservas";  // reservas criadas pelos moradores (localStorage)
@@ -24,6 +25,7 @@ const CHAVE_ACESSOS = "condominio:acessos";    // registro de entradas/consultas
 // "arquivo" é o caminho a partir da raiz do projeto (ver caminho()).
 // "perfis" limita quem vê o link (sem "perfis", todos veem).
 const PAGINAS = [
+    { id: "requerimentos", titulo: "Requerimentos", arquivo: "pages/requerimentos.html", perfis: ["admin", "morador"] },
     { id: "inicio", titulo: "Início", arquivo: "index.html" },
     { id: "calendario", titulo: "Calendário", arquivo: "pages/calendario-condominial.html" },
     { id: "reservas", titulo: "Reservas", arquivo: "pages/reservas.html", perfis: ["admin", "morador"] },
@@ -489,4 +491,8 @@ function escaparHtml(texto) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+function carregarRequerimentos() {
+    return requerimentosMock.concat(lerArmazenamento(CHAVE_REQUERIMENTOS, []));
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achados e perdidos | Gestão Condominial</title>
+    <link rel="stylesheet" href="../css/Sistema.css" />
+</head>
+<body data-raiz="../">
+    <header id="topo" class="topo"></header>
+
+    <main class="pagina">
+        <div class="coluna coluna-larga">
+            <section id="conteudo-achados">
+                <h1 class="pagina-titulo">Achados e perdidos</h1>
+                <p class="pagina-subtitulo">Consulte os itens encontrados ou registre um novo item.</p>
+
+                <div class="abas" role="tablist" aria-label="Achados e perdidos">
+                    <button type="button" class="aba" id="aba-itens" role="tab" aria-selected="true" aria-controls="painel-itens">Itens encontrados</button>
+                    <button type="button" class="aba" id="aba-registro" role="tab" aria-selected="false" aria-controls="painel-registro">Registrar item encontrado</button>
+                </div>
+
+                <section id="painel-itens" role="tabpanel" aria-labelledby="aba-itens">
+                    <div id="item-list" class="coluna"></div>
+                </section>
+
+                <section id="painel-registro" role="tabpanel" aria-labelledby="aba-registro" class="hidden">
+                    <div class="painel">
+                        <h2 class="painel-titulo">Registrar item encontrado</h2>
+                        <p class="painel-texto">Informe os dados do item e onde e quando ele foi encontrado.</p>
+
+                        <div id="mensagem-formulario" class="mensagem hidden" role="alert"></div>
+                        <form id="item-form" class="formulario" novalidate>
+                            <label class="campo" for="item-name">
+                                Nome do item
+                                <input type="text" id="item-name" maxlength="100" required>
+                            </label>
+
+                            <label class="campo" for="item-pic">
+                                Link da foto (URL)
+                                <input type="url" id="item-pic" placeholder="https://..." required>
+                            </label>
+
+                            <label class="campo" for="item-description">
+                                Onde e quando foi encontrado
+                                <textarea id="item-description" rows="4" maxlength="500" required></textarea>
+                            </label>
+
+                            <button type="submit" class="btn">Registrar item</button>
+                        </form>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/DadosMock.js"></script>
+    <script src="../js/Comum.js"></script>
+    <script src="../js/AchadosPerdidos.js"></script>
+    <script src="../js/DadosTeste.js"></script>
+</body>
+</html>

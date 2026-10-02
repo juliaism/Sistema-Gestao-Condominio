@@ -88,11 +88,11 @@ function criarBotaoRestaurar() {
     botao.className = "btn btn-secundario btn-bloco";
     botao.textContent = "Restaurar dados de exemplo";
     botao.addEventListener("click", () => {
-        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos, correspondências e registros criados durante os testes?");
+        const confirmou = window.confirm("Apagar os eventos, reservas, requerimentos, pessoas, veículos, correspondências, itens encontrados e registros criados durante os testes?");
         if (!confirmou) return;
 
         try {
-            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS, CHAVE_CORRESPONDENCIAS]
+            [CHAVE_EVENTOS, CHAVE_RESERVAS, CHAVE_REQUERIMENTOS, CHAVE_PESSOAS, CHAVE_VEICULOS, CHAVE_ACESSOS, CHAVE_CORRESPONDENCIAS, CHAVE_ACHADOS]
                 .forEach(chave => localStorage.removeItem(chave));
         } catch (erro) {
             console.warn("Não foi possível limpar os dados locais.", erro);

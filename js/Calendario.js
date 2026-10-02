@@ -1,17 +1,3 @@
-/*
- * Calendario.js
- * ------------------------------------------------------------------
- * Calendário condominial (usado em pages/calendario-condominial.html):
- * desenha os dias do mês, marca os dias com eventos e mostra a lista
- * de eventos do dia clicado.
- *
- * Os eventos de exemplo (mockEventos) ficam em DadosMock.js, que deve
- * ser carregado antes deste arquivo. O cadastro de novos eventos é feito
- * pela síndica em RegistroEvento.js, que verifica a permissão do usuário
- * e também coloca no calendário as reservas de áreas comuns.
- */
-
-
 let currentDate = new Date(2026, 9, 1); 
 let selectedDate = null;
 
@@ -58,6 +44,15 @@ function renderCalendar() {
         daySquare.innerText = day;
         
         const dateString = formatDateString(year, month, day);
+        
+        const loopDate = new Date(year, month, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const isPastDate = loopDate < today;
+
+        if (isPastDate) {
+        daySquare.classList.add('past');
+        }
 
         if (mockEventos[dateString]) {
             daySquare.classList.add("marked");
@@ -68,6 +63,8 @@ function renderCalendar() {
         }
 
         daySquare.addEventListener("click", () => {
+            if (isPastDate) return;
+            
             selectedDate = dateString;
             renderCalendar();
 
@@ -106,8 +103,6 @@ function renderEventos(dateString, isPastDate = false) {
 
                 card.classList.add("card");
 
-                // Etiqueta do tipo (Aviso, Manutenção, Reserva...), quando o evento tiver tipo.
-                // nomeTipoEvento vem de Comum.js.
                 const etiqueta = item.tipo && typeof nomeTipoEvento === "function"
                     ? `<span class="event-tag event-tag-${item.tipo}">${nomeTipoEvento(item.tipo)}</span>`
                     : "";

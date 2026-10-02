@@ -20,6 +20,7 @@ const CHAVE_PESSOAS = "condominio:pessoas";    // pessoas permitidas cadastradas
 const CHAVE_VEICULOS = "condominio:veiculos";  // veículos permitidos cadastrados pelo porteiro (localStorage)
 const CHAVE_ACESSOS = "condominio:acessos";    // registro de entradas/consultas da portaria (localStorage)
 const CHAVE_CORRESPONDENCIAS = "condominio:correspondencias"; // correspondências registradas na portaria (localStorage)
+const CHAVE_ACHADOS = "condominio:achados";    
 
 // Páginas que aparecem no menu do cabeçalho.
 // "id" é usado para destacar a página em que o usuário está.
@@ -31,7 +32,8 @@ const PAGINAS = [
     { id: "calendario", titulo: "Calendário", arquivo: "pages/calendario-condominial.html" },
     { id: "reservas", titulo: "Reservas", arquivo: "pages/reservas.html", perfis: ["admin", "morador"] },
     { id: "portaria", titulo: "Portaria", arquivo: "pages/portaria.html", perfis: ["porteiro"] },
-    { id: "correspondencias", titulo: "Correspondências", arquivo: "pages/correspondencias.html", perfis: ["admin", "porteiro"] }
+    { id: "correspondencias", titulo: "Correspondências", arquivo: "pages/correspondencias.html", perfis: ["admin", "porteiro"] },
+    { id: "achados-perdidos", titulo: "Achados e perdidos", arquivo: "pages/achados--perdidos.html" }
 ];
 
 // Tela de login, a partir da raiz do projeto.
